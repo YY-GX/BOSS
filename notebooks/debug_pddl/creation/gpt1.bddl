@@ -1,0 +1,66 @@
+(define (problem LIBERO_Kitchen_Tabletop_Manipulation)
+  (:domain robosuite)
+  (:language Setting the Table)
+    (:regions
+      (dining_set_group_init_region
+          (:target kitchen_table)
+          (:ranges (
+              (-0.2 -0.2 0.2 0.2)
+            )
+          )
+          (:yaw_rotation (
+              (0.0 0.0)
+            )
+          )
+      )
+      (plate_init_region
+          (:target kitchen_table)
+          (:ranges (
+              (-0.01 -0.01 0.01 0.01)
+            )
+          )
+          (:yaw_rotation (
+              (0.0 0.0)
+            )
+          )
+      )
+      (bowl_drainer_init_region
+          (:target kitchen_table)
+          (:ranges (
+              (0.01 0.01 0.03 0.03)
+            )
+          )
+          (:yaw_rotation (
+              (0.0 0.0)
+            )
+          )
+      )
+    )
+
+  (:fixtures
+    dining_set_group_1 - dining_set_group
+    kitchen_table - kitchen_table
+  )
+
+  (:objects
+    plate_1 - plate
+    bowl_drainer_1 - bowl_drainer
+  )
+
+  (:obj_of_interest
+    plate_1
+  )
+
+  (:init
+    (On dining_set_group_1 kitchen_table_dining_set_group_init_region)
+    (On plate_1 kitchen_table_plate_init_region)
+    (On bowl_drainer_1 kitchen_table_bowl_drainer_init_region)
+  )
+
+  (:goal
+    (And
+      (On plate_1 dining_set_group_1)
+      (On bowl_drainer_1 dining_set_group_1)
+    )
+  )
+)

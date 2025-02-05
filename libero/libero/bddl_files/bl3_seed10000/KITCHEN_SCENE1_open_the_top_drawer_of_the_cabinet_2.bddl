@@ -1,0 +1,69 @@
+(define (problem libero_kitchen_tabletop_manipulation)
+      (:domain robosuite)
+      (:language open the top drawer of the cabinet)
+    
+      (:regions
+        (wooden_cabinet_init_region
+      (:target kitchen_table)
+      (:ranges (
+        (-1e-10 -0.3 0.0 -0.29999999999)
+      ))
+      (:yaw_rotation (
+        (3.141592653589793 3.141592653589793)
+      ))
+    )
+    (akita_black_bowl_init_region
+      (:target kitchen_table)
+      (:ranges (
+        (-0.025 -0.025 0.025 0.025)
+      ))
+    )
+    (plate_init_region
+      (:target kitchen_table)
+      (:ranges (
+        (-0.025 0.225 0.025 0.275)
+      ))
+    )
+    (top_side
+      (:target wooden_cabinet_1)
+    )
+    (top_region
+      (:target wooden_cabinet_1)
+    )
+    (middle_region
+      (:target wooden_cabinet_1)
+    )
+    (bottom_region
+      (:target wooden_cabinet_1)
+    )
+  )
+    
+      (:fixtures
+        kitchen_table - kitchen_table
+    wooden_cabinet_1 - wooden_cabinet
+      )
+    
+      (:objects
+        akita_black_bowl_1 - akita_black_bowl
+    plate_1 - plate
+    egg_1 - egg
+      )
+    
+      (:obj_of_interest
+            wooden_cabinet_1
+      )
+    
+      (:init
+        (on akita_black_bowl_1 kitchen_table_akita_black_bowl_init_region)
+    (on plate_1 kitchen_table_plate_init_region)
+    (on wooden_cabinet_1 kitchen_table_wooden_cabinet_init_region)
+    (on egg_1 plate_1)
+      )
+    
+      (:goal
+        (And
+          (open wooden_cabinet_1_top_region)
+        )
+      )
+    
+)

@@ -1,0 +1,87 @@
+(define (problem libero_kitchen_tabletop_manipulation)
+      (:domain robosuite)
+      (:language close the bottom drawer of the cabinet)
+    
+      (:regions
+        (white_cabinet_init_region
+      (:target kitchen_table)
+      (:ranges (
+        (-1e-10 0.29999999999 0.0 0.3)
+      ))
+    )
+    (wine_rack_init_region
+      (:target kitchen_table)
+      (:ranges (
+        (-0.11 -0.31 -0.09000000000000001 -0.29)
+      ))
+      (:yaw_rotation (
+        (3.141592653589793 3.141592653589793)
+      ))
+    )
+    (akita_black_bowl_init_region
+      (:target kitchen_table)
+      (:ranges (
+        (0.0049999999999999975 -0.07500000000000001 0.055 -0.025)
+      ))
+    )
+    (wine_bottle_init_region
+      (:target kitchen_table)
+      (:ranges (
+        (-0.175 0.025 -0.125 0.07500000000000001)
+      ))
+    )
+    (top_side
+      (:target white_cabinet_1)
+    )
+    (top_region
+      (:target white_cabinet_1)
+    )
+    (middle_region
+      (:target white_cabinet_1)
+    )
+    (bottom_region
+      (:target white_cabinet_1)
+    )
+    (top_region
+      (:target wine_rack_1)
+    )
+    (egg_init_region
+      (:target kitchen_table)
+      (:ranges (
+        (0.15 -0.5 0.275 0.055)
+      ))
+    )
+  )
+    
+      (:fixtures
+        kitchen_table - kitchen_table
+    white_cabinet_1 - white_cabinet
+    wine_rack_1 - wine_rack
+      )
+    
+      (:objects
+        akita_black_bowl_1 - akita_black_bowl
+    wine_bottle_1 - wine_bottle
+    egg_1 - egg
+      )
+    
+      (:obj_of_interest
+            white_cabinet_1
+      )
+    
+      (:init
+        (on akita_black_bowl_1 kitchen_table_akita_black_bowl_init_region)
+    (on wine_bottle_1 kitchen_table_wine_bottle_init_region)
+    (on white_cabinet_1 kitchen_table_white_cabinet_init_region)
+    (on wine_rack_1 kitchen_table_wine_rack_init_region)
+    (open white_cabinet_1_bottom_region)
+    (on egg_1 kitchen_table_egg_init_region)
+      )
+    
+      (:goal
+        (And
+          (close white_cabinet_1_bottom_region)
+        )
+      )
+    
+)

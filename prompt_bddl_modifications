@@ -1,0 +1,29 @@
+Now I want to modify this environment in scale. Before I tell you more information, here're some information you need to know:
+
+External small objects I have: ['onion', 'egg', 'chocolate_pudding', 'lemon', 'popcorn', 'potato']
+External large objects I have: ['corn', 'white_yellow_mug', 'red_coffee_mug', 'porcelain_mug', 'chefmate_8_frypan']
+Explanation of the parsed_problem['objects'] -> 'objects': {'akita_black_bowl': ['akita_black_bowl_1'], 'plate': ['plate_1']} Here akita_black_bowl is the name of the object class, akita_black_bowl_1 is the concrete object. For example, 'akita_black_bowl': ['akita_black_bowl_1', 'akita_black_bowl_2'] means that there're 2 bowls.
+
+One rule that cannot be break: the modifications can NOT affect original task's completeness (i.e., parsed_problem['goal_state'] is still reachable after modification && parsed_problem['goal_state'] cannot be implemented because of modification, for example, if the goal is to make top drawer open, you cannot make it open during initialization time).
+
+The modifications only have 3 types:
+
+1. Change existing non-interested (i.e., objects in parsed_problem['objects'] but not in parsed_problem['obj_of_interest']) objects' position (e.g., change it to some other regions) or Add external objects to regions where they won't affect (i.e., far away from them) parsed_problem['obj_of_interest'].
+For example, now the 'initial_state' is:
+[['on', 'akita_black_bowl_1', 'kitchen_table_akita_black_bowl_init_region'],
+ ['on', 'plate_1', 'kitchen_table_plate_init_region'],
+ ['on', 'wooden_cabinet_1', 'kitchen_table_wooden_cabinet_init_region']]
+Then one possible modification is to:
+(1) delete ['on', 'akita_black_bowl_1', 'kitchen_table_akita_black_bowl_init_region'] in the dict
+(2) add ['on', 'akita_black_bowl_1', 'wooden_cabinet_1_top_side'].
+You can see 'akita_black_bowl_1' is the object listed in the parsed_problem['objects'], and 'wooden_cabinet_1_top_side' is an region listed in parsed_problem['regions']
+Another possible modification is to add external small/large objects, such as add ['on', 'corn_1', 'wooden_cabinet_1_top_side']. And if you observe that corn is not in parsed_problem['objects'], then add 'corn': ['corn_1'] to parsed_problem['objects'].
+
+
+2. Change existing parsed_problem['objects'] state:
+For example, middle drawer is closed, the modification could to open it if it's not related to parsed_problem['goal_state']. For example, add ['open', 'wooden_cabinet_1_bottom_region']. Remember, for drawers, the default state is closed, so if not explicitly listed, then it's closed.
+
+3. If there're some container (e.g., akita_black_bowl_1) in parsed_problem['obj_of_interest'], put SMALL external objects into the container.
+For example, add ["on", "onion_1", "akita_black_bowl_1"] to parsed_problem['initial_state']. But you will notice that doesn't appear in the current bddl dict, then you also need to add 'plate': ['plate_1'] to parsed_problem['objects'].
+
+Based on the 3 types of modifications, give me a python script for modifying parsed_problem in a most diverse way (e.g., randomly choice one from the 3 types, and for each type, randomly choice different combinations). Only 1 modification happens!

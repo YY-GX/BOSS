@@ -1,0 +1,74 @@
+(define (problem libero_kitchen_tabletop_manipulation)
+      (:domain robosuite)
+      (:language close the microwave)
+    
+      (:regions
+        (microwave_init_region
+      (:target kitchen_table)
+      (:ranges (
+        (-0.01 0.33999999999999997 0.01 0.36)
+      ))
+    )
+    (white_yellow_mug_init_region
+      (:target kitchen_table)
+      (:ranges (
+        (-0.025 -0.025 0.025 0.025)
+      ))
+    )
+    (porcelain_mug_init_region
+      (:target kitchen_table)
+      (:ranges (
+        (-0.125 -0.275 -0.07500000000000001 -0.225)
+      ))
+    )
+    (porcelain_mug_front_region
+      (:target kitchen_table)
+      (:ranges (
+        (-0.05 -0.3 0.05 -0.2)
+      ))
+    )
+    (top_side
+      (:target microwave_1)
+    )
+    (heating_region
+      (:target microwave_1)
+    )
+    (red_coffee_mug_init_region
+      (:target kitchen_table)
+      (:ranges (
+        (-0.3 -0.3 -0.2 0.05)
+        (0.1 -0.3 0.3 0.05)
+      ))
+    )
+  )
+    
+      (:fixtures
+        kitchen_table - kitchen_table
+    microwave_1 - microwave
+      )
+    
+      (:objects
+        porcelain_mug_1 - porcelain_mug
+    white_yellow_mug_1 - white_yellow_mug
+    red_coffee_mug_1 - red_coffee_mug
+      )
+    
+      (:obj_of_interest
+            microwave_1
+      )
+    
+      (:init
+        (on porcelain_mug_1 kitchen_table_porcelain_mug_init_region)
+    (on white_yellow_mug_1 kitchen_table_white_yellow_mug_init_region)
+    (on microwave_1 kitchen_table_microwave_init_region)
+    (open microwave_1)
+    (on red_coffee_mug_1 kitchen_table_red_coffee_mug_init_region)
+      )
+    
+      (:goal
+        (And
+          (close microwave_1)
+        )
+      )
+    
+)

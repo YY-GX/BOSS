@@ -1,0 +1,166 @@
+{
+  "case_1": [
+    {
+      "task": "Preparing a Snack",
+      "subtasks": [
+        "Move the popcorn from the shelf to the table.",
+        "Place the chocolate pudding on the table."
+      ],
+      "used_objects": ["wooden_shelf", "popcorn", "chocolate_pudding"]
+    },
+    {
+      "task": "Setting the Table",
+      "subtasks": [
+        "Place the plate on the dining set group.",
+        "Place the bowl drainer on the dining set group."
+      ],
+      "used_objects": ["plate", "dining_set_group", "bowl_drainer"]
+    },
+    {
+      "task": "Organizing Ingredients",
+      "subtasks": [
+        "Move the rack to the countertop.",
+        "Place the cookies on the rack."
+      ],
+      "used_objects": ["rack", "cookies"]
+    },
+    {
+      "task": "Preparing for Cooking",
+      "subtasks": [
+        "Move the chefmate 8 frypan to the stove.",
+        "Place the butter next to the frypan."
+      ],
+      "used_objects": ["chefmate_8_frypan", "flat_stove", "butter"]
+    },
+    {
+      "task": "Setting Up Breakfast",
+      "subtasks": [
+        "Move the white bowl to the table.",
+        "Place the milk next to the white bowl."
+      ],
+      "used_objects": ["white_bowl", "milk"]
+    },
+    {
+      "task": "Arranging Drinks",
+      "subtasks": [
+        "Move the wine bottle to the dining set group.",
+        "Place the red coffee mug next to the wine bottle."
+      ],
+      "used_objects": ["wine_bottle", "dining_set_group", "red_coffee_mug"]
+    },
+    {
+      "task": "Decorating the Kitchen",
+      "subtasks": [
+        "Move the wooden tray to the countertop.",
+        "Place the yellow book on the wooden tray."
+      ],
+      "used_objects": ["wooden_tray", "yellow_book"]
+    },
+    {
+      "task": "Preparing Salad",
+      "subtasks": [
+        "Move the salad dressing to the table.",
+        "Place the corn next to the salad dressing."
+      ],
+      "used_objects": ["salad_dressing", "corn"]
+    },
+    {
+      "task": "Organizing Spices",
+      "subtasks": [
+        "Move the ketchup to the shelf.",
+        "Place the tomato sauce next to the ketchup."
+      ],
+      "used_objects": ["ketchup", "wooden_shelf", "tomato_sauce"]
+    },
+    {
+      "task": "Setting Up the Coffee Station",
+      "subtasks": [
+        "Move the moka pot to the countertop.",
+        "Place the porcelain mug next to the moka pot."
+      ],
+      "used_objects": ["moka_pot", "porcelain_mug"]
+    }
+  ],
+  "case_2": [
+    {
+      "task": "Preparing a Dessert",
+      "subtasks": [
+        "Move the chocolate pudding to the plate.",
+        "Place the plate with the chocolate pudding in the short fridge."
+      ],
+      "used_objects": ["chocolate_pudding", "plate", "short_fridge"]
+    },
+    {
+      "task": "Organizing the Fridge",
+      "subtasks": [
+        "Move the milk to the wooden tray.",
+        "Place the wooden tray with milk into the short fridge."
+      ],
+      "used_objects": ["milk", "wooden_tray", "short_fridge"]
+    },
+    {
+      "task": "Preparing a Meal",
+      "subtasks": [
+        "Move the butter to the bowl.",
+        "Place the bowl with butter on the dining set group."
+      ],
+      "used_objects": ["butter", "white_bowl", "dining_set_group"]
+    },
+    {
+      "task": "Setting Up the Snack Area",
+      "subtasks": [
+        "Move the cookies to the wooden tray.",
+        "Place the wooden tray with cookies on the table."
+      ],
+      "used_objects": ["cookies", "wooden_tray"]
+    },
+    {
+      "task": "Organizing the Shelf",
+      "subtasks": [
+        "Move the wine bottle to the wine rack.",
+        "Place the wine rack with the wine bottle on the wooden shelf."
+      ],
+      "used_objects": ["wine_bottle", "wine_rack", "wooden_shelf"]
+    },
+    {
+      "task": "Preparing a Cheese Platter",
+      "subtasks": [
+        "Move the cream cheese to the wooden tray.",
+        "Place the wooden tray with cream cheese on the dining set group."
+      ],
+      "used_objects": ["cream_cheese", "wooden_tray", "dining_set_group"]
+    },
+    {
+      "task": "Setting Up Breakfast Items",
+      "subtasks": [
+        "Move the orange juice to the white bowl.",
+        "Place the white bowl with orange juice on the table."
+      ],
+      "used_objects": ["orange_juice", "white_bowl"]
+    },
+    {
+      "task": "Organizing Cookware",
+      "subtasks": [
+        "Move the chefmate 8 frypan to the wooden tray.",
+        "Place the wooden tray with the frypan on the flat stove."
+      ],
+      "used_objects": ["chefmate_8_frypan", "wooden_tray", "flat_stove"]
+    },
+    {
+      "task": "Preparing a Snack Tray",
+      "subtasks": [
+        "Move the popcorn to the wooden tray.",
+        "Place the wooden tray with popcorn on the table."
+      ],
+      "used_objects": ["popcorn", "wooden_tray"]
+    },
+    {
+      "task": "Setting Up a Drink Station",
+      "subtasks": [
+        "Move the porcelain mug to the wooden tray.",
+        "Place the wooden tray with the mug on the dining set group."
+      ],
+      "used_objects": ["porcelain_mug", "wooden_tray", "dining_set_group"]
+    }
+  ]
+}

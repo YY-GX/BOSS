@@ -1,0 +1,76 @@
+(define (problem libero_kitchen_tabletop_manipulation)
+      (:domain robosuite)
+      (:language put the black bowl on the plate)
+    
+      (:regions
+        (white_cabinet_init_region
+      (:target kitchen_table)
+      (:ranges (
+        (-1e-10 0.29999999999 0.0 0.3)
+      ))
+    )
+    (akita_black_bowl_init_region
+      (:target kitchen_table)
+      (:ranges (
+        (0.0049999999999999975 -0.07500000000000001 0.055 -0.025)
+      ))
+    )
+    (ketchup_init_region
+      (:target kitchen_table)
+      (:ranges (
+        (-0.125 -0.125 -0.07500000000000001 -0.07500000000000001)
+      ))
+    )
+    (plate_init_region
+      (:target kitchen_table)
+      (:ranges (
+        (-0.07500000000000001 -0.275 -0.025 -0.225)
+      ))
+    )
+    (top_side
+      (:target white_cabinet_1)
+    )
+    (top_region
+      (:target white_cabinet_1)
+    )
+    (middle_region
+      (:target white_cabinet_1)
+    )
+    (bottom_region
+      (:target white_cabinet_1)
+    )
+  )
+    
+      (:fixtures
+        kitchen_table - kitchen_table
+    white_cabinet_1 - white_cabinet
+      )
+    
+      (:objects
+        akita_black_bowl_1 - akita_black_bowl
+    plate_1 - plate
+    ketchup_1 - ketchup
+    chocolate_pudding_1 - chocolate_pudding
+      )
+    
+      (:obj_of_interest
+            akita_black_bowl_1
+    plate_1
+      )
+    
+      (:init
+        (on akita_black_bowl_1 kitchen_table_akita_black_bowl_init_region)
+    (on plate_1 kitchen_table_plate_init_region)
+    (on white_cabinet_1 kitchen_table_white_cabinet_init_region)
+    (on ketchup_1 kitchen_table_ketchup_init_region)
+    (open white_cabinet_1_top_region)
+    (on chocolate_pudding_1 plate_1)
+      )
+    
+      (:goal
+        (And
+          (on akita_black_bowl_1 plate_1)
+        )
+      )
+    
+)

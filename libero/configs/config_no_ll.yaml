@@ -1,0 +1,52 @@
+# @package _global_
+
+defaults:
+  - _self_
+  - data: default
+  - policy: bc_transformer_policy
+#  - policy: bc_rnn_policy
+#  - policy: bc_vilt_policy
+  - train: default
+  - eval: default
+  - lifelong: base
+  - test: null
+
+seed: 10000
+use_wandb: true
+wandb_project: "separate skill learning"
+folder: null # use default path
+bddl_folder: null # use default path
+init_states_folder: null # use default path
+load_previous_model: false
+device: "cuda:0"
+task_embedding_format: "bert"
+task_embedding_one_hot_offset: 1
+pretrain: false
+pretrain_model_path: ""
+benchmark_name: "libero_90"
+#benchmark_name: "yy_try"
+#version: "kitchen_v0"
+#version: "training_eval_skills_original_env"
+version: "skill_policies_without_wrist_camera_view"
+# yy: Do you wanna to split the 50 demos into 40 & 10?
+is_split: false
+# yy: Do you wanna disable skill rollout eval (only do once after all training)?
+is_customize_task: true
+task_num_to_use: null
+
+# BL3 related parameters
+
+#bl3_folder: "bl3"
+#bl3_mapping: "bl3.json"
+#only_success: false
+#ratio: 1.0
+
+#bl3_folder: "bl3_seed10000"
+#bl3_mapping: "bl3_seed10000.json"
+#only_success: true
+#ratio: 1.0
+
+bl3_folder: "bl3_all"
+bl3_mapping: "bl3_all.json"
+only_success: true
+ratio: 1.0

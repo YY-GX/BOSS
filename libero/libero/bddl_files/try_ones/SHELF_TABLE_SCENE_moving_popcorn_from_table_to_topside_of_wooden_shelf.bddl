@@ -1,0 +1,76 @@
+(define (problem LIBERO_Kitchen_Tabletop_Manipulation)
+  (:domain robosuite)
+  (:language Moving popcorn from table to topside of wooden shelf)
+    (:regions
+      (wooden_shelf_init_region
+          (:target kitchen_table)
+          (:ranges (
+              (-0.01 -0.31 0.01 -0.29)
+            )
+          )
+          (:yaw_rotation (
+              (3.141592653589793 3.141592653589793)
+            )
+          )
+      )
+      (popcorn_init_region
+          (:target kitchen_table)
+          (:ranges (
+              (-0.01 -0.01 0.01 0.01)
+            )
+          )
+          (:yaw_rotation (
+              (0.0 0.0)
+            )
+          )
+      )
+      (chocolate_pudding_init_region
+          (:target kitchen_table)
+          (:ranges (
+              (-0.01 0.19 0.01 0.21000000000000002)
+            )
+          )
+          (:yaw_rotation (
+              (0.0 0.0)
+            )
+          )
+      )
+      (top_side
+          (:target wooden_shelf_1)
+      )
+      (top_region
+          (:target wooden_shelf_1)
+      )
+      (middle_region
+          (:target wooden_shelf_1)
+      )
+      (bottom_region
+          (:target wooden_shelf_1)
+      )
+    )
+
+  (:fixtures
+    wooden_shelf_1 - wooden_shelf
+    kitchen_table - kitchen_table
+  )
+
+  (:objects
+    popcorn_1 - popcorn
+    chocolate_pudding_1 - chocolate_pudding
+  )
+
+  (:obj_of_interest
+    popcorn_1
+  )
+
+  (:init
+    (On wooden_shelf_1 kitchen_table_wooden_shelf_init_region)
+    (On popcorn_1 kitchen_table_popcorn_init_region)
+    (On chocolate_pudding_1 kitchen_table_chocolate_pudding_init_region)
+  )
+
+  (:goal
+    (And (On popcorn_1 wooden_shelf_1_top_side))
+  )
+
+)

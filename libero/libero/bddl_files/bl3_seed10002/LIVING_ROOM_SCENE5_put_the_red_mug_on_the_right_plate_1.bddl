@@ -1,0 +1,70 @@
+(define (problem libero_living_room_tabletop_manipulation)
+      (:domain robosuite)
+      (:language put the red mug on the right plate)
+    
+      (:regions
+        (plate_left_region
+      (:target living_room_table)
+      (:ranges (
+        (-0.025 -0.325 0.025 -0.27499999999999997)
+      ))
+    )
+    (plate_right_region
+      (:target living_room_table)
+      (:ranges (
+        (-0.025 0.27499999999999997 0.025 0.325)
+      ))
+    )
+    (porcelain_mug_init_region
+      (:target living_room_table)
+      (:ranges (
+        (-0.125 -0.175 -0.07500000000000001 -0.125)
+      ))
+    )
+    (white_yellow_mug_init_region
+      (:target living_room_table)
+      (:ranges (
+        (-0.07500000000000001 0.07500000000000001 -0.025 0.125)
+      ))
+    )
+    (red_coffee_mug_init_region
+      (:target living_room_table)
+      (:ranges (
+        (-0.225 -0.025 -0.17500000000000002 0.025)
+      ))
+    )
+  )
+    
+      (:fixtures
+        living_room_table - living_room_table
+      )
+    
+      (:objects
+        porcelain_mug_1 - porcelain_mug
+    red_coffee_mug_1 - red_coffee_mug
+    white_yellow_mug_1 - white_yellow_mug
+    plate_1 plate_2 - plate
+    egg_1 - egg
+      )
+    
+      (:obj_of_interest
+            red_coffee_mug_1
+    plate_2
+      )
+    
+      (:init
+        (on plate_1 living_room_table_plate_left_region)
+    (on plate_2 living_room_table_plate_right_region)
+    (on red_coffee_mug_1 living_room_table_red_coffee_mug_init_region)
+    (on white_yellow_mug_1 living_room_table_white_yellow_mug_init_region)
+    (on porcelain_mug_1 living_room_table_porcelain_mug_init_region)
+    (on egg_1 plate_2)
+      )
+    
+      (:goal
+        (And
+          (on red_coffee_mug_1 plate_2)
+        )
+      )
+    
+)
