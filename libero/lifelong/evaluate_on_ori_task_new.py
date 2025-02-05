@@ -50,7 +50,7 @@ def main():
     args = parse_args()
     
     # Get the benchmarks
-    benchmark = get_benchmark(args.benchmark)(args.task_order_index, n_tasks_=args.task_num_to_use)
+    benchmark = get_benchmark(args.benchmark)(n_tasks=args.task_num_to_use)
     n_tasks = benchmark.n_tasks
     task_id_ls = task_orders[args.task_order_index]
 

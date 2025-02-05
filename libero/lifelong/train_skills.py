@@ -61,7 +61,7 @@ def main(hydra_cfg):
     """
     Prepare datasets - demos + language embeddings
     """
-    benchmark = get_benchmark(cfg.benchmark_name)(cfg.data.task_order_index, n_tasks_=cfg.task_num_to_use)
+    benchmark = get_benchmark(cfg.benchmark_name)(n_tasks=cfg.task_num_to_use)
     n_manip_tasks = benchmark.n_tasks
 
     if cfg.is_debug:
