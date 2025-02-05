@@ -76,7 +76,7 @@ def main(hydra_cfg):
         try:
             task_i_dataset, shape_meta = get_dataset(
                 dataset_path=os.path.join(
-                    cfg.folder, benchmark.get_task_demonstration(i)
+                    "./libero/datasets/", benchmark.get_task_demonstration(i)
                 ),
                 obs_modality=cfg.data.obs.modality,
                 initialize_obs_utils=True,

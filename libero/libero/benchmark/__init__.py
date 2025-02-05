@@ -71,7 +71,6 @@ class Benchmark(abc.ABC):
     def get_task_emb(self, i):
         return self.task_embs[i]
 
-
     def get_task_init_states(self, i):
         init_states_path = os.path.join(
             get_libero_path("init_states"),
