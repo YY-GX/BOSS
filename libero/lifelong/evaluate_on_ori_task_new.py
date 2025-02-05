@@ -25,15 +25,6 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 
-# TODO: check whether the algo is created correctly
-algo_map = {
-    "base": "Sequential",
-    "er": "ER",
-    "ewc": "EWC",
-    "packnet": "PackNet",
-    "multitask": "Multitask",
-}
-
 def parse_args():
     parser = argparse.ArgumentParser(description="Evaluation Script")
     parser.add_argument("--model_path_folder", type=str, default="/mnt/arc/yygx/pkgs_baselines/LIBERO/libero/experiments/libero_90/training_eval_skills_original_env/Sequential/BCRNNPolicy_seed10000/all/")
@@ -96,7 +87,7 @@ def main():
         os.system(f"mkdir -p {save_dir}")
 
         # Create algo
-        algo = safe_device(get_algo_class(algo_map["base"])(n_tasks, cfg), cfg.device)
+        algo = safe_device(get_algo_class("Sequential")(n_tasks, cfg), cfg.device)
         algo.policy.load_state_dict(sd)
 
         # Obtain language embs & task

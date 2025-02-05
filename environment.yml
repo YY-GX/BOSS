@@ -145,6 +145,9 @@ dependencies:
   - zstandard=0.23.0=py310ha39cb0e_1
   - zstd=1.5.6=ha6fb4c9_0
   - pip:
+      - torch==2.3.1
+      - torchaudio==2.2.0
+      - torchvision==0.18.1
       - absl-py==2.1.0
       - accelerate==0.32.1
       - aiofiles==23.2.1
@@ -160,7 +163,7 @@ dependencies:
       - cloudpickle==3.1.0
       - cmake==3.30.5
       - cycler==0.12.1
-      - dlimp==0.0.1
+        #      - dlimp==0.0.1
       - dm-tree==0.1.8
       - docker-pycreds==0.4.0
       - draccus==0.8.0
@@ -173,7 +176,7 @@ dependencies:
       - fastapi==0.115.3
       - fastjsonschema==2.20.0
       - ffmpy==0.4.0
-      - flash-attn==2.6.1
+#      - flash-attn==2.6.1
       - flatbuffers==24.3.25
       - fonttools==4.54.1
       - fsspec==2024.9.0
@@ -213,7 +216,7 @@ dependencies:
       - kiwisolver==1.4.7
       - libclang==18.1.1
       - llvmlite==0.43.0
-      - mani-skill2-real2sim==0.5.3
+#      - mani-skill2-real2sim==0.5.3
       - markdown==3.7
       - markdown-it-py==3.0.0
       - matplotlib==3.9.2
@@ -326,9 +329,6 @@ dependencies:
       - toml==0.10.2
       - tomli==2.0.2
       - tomlkit==0.12.0
-      - torch==2.3.1
-      - torchaudio==2.2.0
-      - torchvision==0.18.1
       - tqdm==4.66.5
       - traitlets==5.14.3
       - transformers==4.46.1
