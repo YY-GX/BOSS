@@ -159,31 +159,31 @@ Register
 @register_benchmark
 class BOSS_44(Benchmark):
     def __init__(self, n_tasks=None):
-        super().__init__(n_tasks=n_tasks)
         self.name = "boss_44"
+        super().__init__(n_tasks=n_tasks)
         self._make_benchmark()
 
 @register_benchmark
 class CHALLENGE_1(Benchmark):
     def __init__(self, n_tasks=None):
-        super().__init__(n_tasks=n_tasks)
         self.name = "ch1"
+        super().__init__(n_tasks=n_tasks)
         self._make_benchmark()
 
 
 @register_benchmark
 class CHALLENGE_2_2(Benchmark):
     def __init__(self, n_tasks=None):
-        super().__init__(n_tasks=n_tasks)
         self.name = "ch2_2_modifications"
+        super().__init__(n_tasks=n_tasks)
         self._make_benchmark()
 
 
 @register_benchmark
 class CHALLENGE_2_3(Benchmark):
     def __init__(self, n_tasks=None):
-        super().__init__(n_tasks=n_tasks)
         self.name = "ch2_3_modifications"
+        super().__init__(n_tasks=n_tasks)
         self._make_benchmark()
 
 
@@ -191,32 +191,32 @@ class CHALLENGE_2_3(Benchmark):
 @register_benchmark
 class FACTOR_1(Benchmark):
     def __init__(self, n_tasks=None):
-        super().__init__(n_tasks=n_tasks)
         self.name = "factor_1"
+        super().__init__(n_tasks=n_tasks)
         self._make_benchmark()
 
 
 @register_benchmark
 class FACTOR_2(Benchmark):
     def __init__(self, n_tasks=None):
-        super().__init__(n_tasks=n_tasks)
         self.name = "factor_2"
+        super().__init__(n_tasks=n_tasks)
         self._make_benchmark()
 
 
 @register_benchmark
 class DATA_AUGMENTATION(Benchmark):
     def __init__(self, n_tasks=None):
-        super().__init__(n_tasks=n_tasks)
         self.name = "data_augmentation"
+        super().__init__(n_tasks=n_tasks)
         self._make_benchmark()
 
 
 @register_benchmark
 class LIBERO_90(Benchmark):
     def __init__(self, n_tasks=None):
-        super().__init__(n_tasks=n_tasks)
         self.name = "libero_90"
+        super().__init__(n_tasks=n_tasks)
         self._make_benchmark()
 
 
