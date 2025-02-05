@@ -13,52 +13,9 @@ from libero.lifelong.models import *
 from libero.lifelong.utils import *
 import wandb
 
-REGISTERED_ALGOS = {}
-
-
-def register_algo(policy_class):
-    """Register a policy class with the registry."""
-    policy_name = policy_class.__name__.lower()
-    if policy_name in REGISTERED_ALGOS:
-        raise ValueError("Cannot register duplicate policy ({})".format(policy_name))
-
-    REGISTERED_ALGOS[policy_name] = policy_class
-
-
-def get_algo_class(algo_name):
-    """Get the policy class from the registry."""
-    if algo_name.lower() not in REGISTERED_ALGOS:
-        raise ValueError(
-            "Policy class with name {} not found in registry".format(algo_name)
-        )
-    return REGISTERED_ALGOS[algo_name.lower()]
-
-
-def get_algo_list():
-    return REGISTERED_ALGOS
-
-
-class AlgoMeta(type):
-    """Metaclass for registering environments"""
-
-    def __new__(meta, name, bases, class_dict):
-        cls = super().__new__(meta, name, bases, class_dict)
-
-        # List all algorithms that should not be registered here.
-        _unregistered_algos = []
-
-        if cls.__name__ not in _unregistered_algos:
-            register_algo(cls)
-        return cls
-
-
-class PolicyStarter(nn.Module, metaclass=AlgoMeta):
+class PolicyStarter(nn.Module):
     """
-    The sequential finetuning BC baseline, also the superclass of all lifelong
-    learning algorithms.
-
-    NOTE: For BOSS benchmark, this class is modified to only enable skill training
-    separately, and is not related to lifelong learning any more.
+    For skill training
     """
 
     def __init__(self, n_tasks, cfg):
@@ -83,7 +40,7 @@ class PolicyStarter(nn.Module, metaclass=AlgoMeta):
         """
         pass
 
-    def start_task(self, task, is_no_ll=False):
+    def start_task(self, task):
         """
         What the algorithm does at the beginning of learning each lifelong task.
         """
@@ -102,15 +59,14 @@ class PolicyStarter(nn.Module, metaclass=AlgoMeta):
                 **self.cfg.train.scheduler.kwargs,
             )
 
-
-
     def map_tensor_to_device(self, data):
         """Move data to the device specified by self.cfg.device."""
         return TensorUtils.map_tensor(
             data, lambda x: safe_device(x, device=self.cfg.device)
         )
 
-    # yy: where the optimization happens
+
+    # Optimization
     def observe(self, data):
         """
         How the algorithm learns on each data point.
@@ -126,6 +82,7 @@ class PolicyStarter(nn.Module, metaclass=AlgoMeta):
         self.optimizer.step()
         return loss.item()
 
+
     def eval_observe(self, data):
         data = self.map_tensor_to_device(data)
         with torch.no_grad():
@@ -136,7 +93,7 @@ class PolicyStarter(nn.Module, metaclass=AlgoMeta):
     # Train each skill policy
     def learn_one_task(self, dataset, datasets_eval, algo, task_id, benchmark, result_summary, cfg):
 
-        self.start_task(task_id, is_no_ll=True)
+        self.start_task(task_id)
 
         # recover the corresponding manipulation task ids
         gsz = self.cfg.data.task_group_size
@@ -154,13 +111,9 @@ class PolicyStarter(nn.Module, metaclass=AlgoMeta):
             persistent_workers=self.cfg.train.num_workers > 0
         )
 
-        prev_success_rate = -1.0
-        best_state_dict = self.policy.state_dict()  # currently save the best model
-
         # for evaluate how fast the agent learns on current task, this corresponds
         # to the area under success rate curve on the new task.
         cumulated_counter = 0.0
-        idx_at_best_succ = 0
         successes = []
         losses = []
 
@@ -254,12 +207,8 @@ class PolicyStarter(nn.Module, metaclass=AlgoMeta):
             if self.scheduler is not None and epoch > 0:
                 self.scheduler.step()
 
-        # yy: Do NOT load any state_dict at the start of training a new policy
-        # # load the best performance agent on the current task
-        # self.policy.load_state_dict(torch_load_model(model_checkpoint_name)[0])
 
-        # yy: do nothing in end_task()
-        # end learning the current task, some algorithms need post-processing
+        # Do nothing in end_task()
         self.end_task(dataset, task_id, benchmark)
 
         # return the metrics regarding forward transfer
@@ -276,13 +225,7 @@ class PolicyStarter(nn.Module, metaclass=AlgoMeta):
             auc_checkpoint_name,
         )
 
-        # pretend that the agent stops learning once it reaches the peak performance
-        # losses[idx_at_best_succ:] = losses[idx_at_best_succ]
-        # successes[idx_at_best_succ:] = successes[idx_at_best_succ]
-        # return successes.sum() / cumulated_counter, losses.sum() / cumulated_counter
         return 0, 0
-
-
 
 
     def reset(self):

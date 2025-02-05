@@ -6,7 +6,7 @@ libero_config_path = os.environ.get(
     "LIBERO_CONFIG_PATH", os.path.expanduser("~/.libero")
 )
 # yy: change config file name
-config_file = os.path.join(libero_config_path, "config_no_ll.yaml")
+config_file = os.path.join(libero_config_path, "config.yaml")
 
 
 def get_path_dict(root_location=os.path.dirname(os.path.abspath(__file__))):

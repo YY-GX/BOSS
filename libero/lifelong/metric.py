@@ -230,9 +230,6 @@ def evaluate_loss(cfg, algo, benchmark, datasets):
     algo.eval()
     losses = []
     for i, dataset in enumerate(datasets):
-        if cfg.lifelong.algo == "PackNet":  # need preprocess weights for PackNet
-            algo = algo.get_eval_algo(task_id=i)
-
         dataloader = DataLoader(
             dataset,
             batch_size=cfg.eval.batch_size,

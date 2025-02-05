@@ -15,7 +15,7 @@ from easydict import EasyDict
 from omegaconf import OmegaConf
 from libero.libero import get_libero_path
 from libero.libero.benchmark import get_benchmark
-from libero.lifelong.algos import get_algo_class, get_algo_list
+from libero.lifelong.policy_starter import PolicyStarter
 from libero.lifelong.models import get_policy_list
 from libero.lifelong.datasets import GroupedTaskDataset, SequenceVLDataset, get_dataset, get_combined_dataset
 from libero.lifelong.metric import evaluate_loss, evaluate_success
@@ -33,7 +33,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 
-@hydra.main(config_path="../configs", config_name="config_no_ll", version_base=None)
+@hydra.main(config_path="../configs", config_name="config", version_base=None)
 def main(hydra_cfg):
     """
     Preparation - configs / random seeds / ...
@@ -48,8 +48,6 @@ def main(hydra_cfg):
     # print configs to terminal
     pp = pprint.PrettyPrinter(indent=2)
     pp.pprint(cfg)
-    pp.pprint("Available algorithms:")
-    pp.pprint(get_algo_list())
     pp.pprint("Available policies:")
     pp.pprint(get_policy_list())
     # control seed
@@ -158,13 +156,13 @@ def main(hydra_cfg):
         # Save the experiment config file, so we can resume or replay later
         with open(os.path.join(cfg.experiment_dir, f"config_task{i}.json"), "w") as f:
             json.dump(cfg, f, cls=NpEncoder, indent=4)
-        algo = safe_device(get_algo_class(cfg.lifelong.algo)(n_tasks, cfg), cfg.device)
+        policy_starter = safe_device(PolicyStarter(n_tasks, cfg), cfg.device)
         print(f"[info] start training on task {i}")
-        algo.train()
+        policy_starter.train()
         t0 = time.time()
 
-        s_fwd, l_fwd = algo.learn_one_task_no_ll(
-            datasets[i], None, algo, i, benchmark, result_summary, cfg
+        s_fwd, l_fwd = policy_starter.learn_one_task(
+            datasets[i], None, policy_starter, i, benchmark, result_summary, cfg
         )
         result_summary["S_fwd"][i] = s_fwd
         result_summary["L_fwd"][i] = l_fwd
@@ -176,14 +174,14 @@ def main(hydra_cfg):
         """
         # evalute on all seen tasks at the end of learning each task
         if cfg.eval.eval:
-            algo.eval()
+            policy_starter.eval()
             print("=========== Start Evaluation (Rollouts) ===========")
-            L = evaluate_loss(cfg, algo, benchmark, datasets[: i + 1])
+            L = evaluate_loss(cfg, policy_starter, benchmark, datasets[: i + 1])
             t2 = time.time()
             # rollout the policy here
             S = evaluate_success(
                 cfg=cfg,
-                algo=algo,
+                algo=policy_starter,
                 benchmark=benchmark,
                 task_ids=[i],
                 result_summary=result_summary if cfg.eval.save_sim_states else None,

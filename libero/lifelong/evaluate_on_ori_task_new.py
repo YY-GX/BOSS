@@ -20,6 +20,7 @@ from libero.lifelong.utils import (
 from libero.lifelong.main import get_task_embs
 import robomimic.utils.obs_utils as ObsUtils
 from libero.lifelong.algos import get_algo_class
+from libero.lifelong.policy_starter import PolicyStarter
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -43,6 +44,7 @@ def parse_args():
     args = parser.parse_args()
     args.device_id = "cuda:" + str(args.device_id)
     return args
+
 
 def main():
     args = parse_args()
@@ -85,7 +87,7 @@ def main():
         os.system(f"mkdir -p {save_dir}")
 
         # Create algo
-        algo = safe_device(get_algo_class("Sequential")(n_tasks, cfg), cfg.device)
+        algo = safe_device(PolicyStarter(n_tasks, cfg), cfg.device)
         algo.policy.load_state_dict(sd)
 
         # Obtain language embs & task

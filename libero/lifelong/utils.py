@@ -107,28 +107,15 @@ def compute_flops(algo, dataset, cfg):
 
 
 def create_experiment_dir(cfg, version=None):
-    prefix = "libero/experiments"
-    # if cfg.pretrain_model_path != "":
-    #     prefix += "_finetune"
-    # if cfg.data.task_order_index > 0:
-    #     prefix += f"_permute{cfg.data.task_order_index}"
-    # if cfg.task_embedding_format == "one-hot":
-    #     prefix += f"_onehot"
-    # if cfg.task_embedding_format == "clip":
-    #     prefix += f"_clip"
-    # if cfg.task_embedding_format == "gpt2":
-    #     prefix += f"_gpt2"
-    # if cfg.task_embedding_format == "roberta":
-    #     prefix += f"_roberta"
-
+    prefix = "./experiments"
     if version:
         experiment_dir = (
-                f"./{prefix}/{cfg.benchmark_name}/{version}/{cfg.lifelong.algo}/"
+                f"./{prefix}/{cfg.benchmark_name}/{version}/"
                 + f"{cfg.policy.policy_type}_seed{cfg.seed}"
         )
     else:
         experiment_dir = (
-            f"./{prefix}/{cfg.benchmark_name}/{cfg.lifelong.algo}/"
+            f"./{prefix}/{cfg.benchmark_name}/0.0.0/"
             + f"{cfg.policy.policy_type}_seed{cfg.seed}"
         )
 
@@ -147,7 +134,6 @@ def create_experiment_dir(cfg, version=None):
         except BaseException:
             pass
     experiment_id += 1
-
     experiment_dir += f"/run_{experiment_id:03d}"
     cfg.experiment_dir = experiment_dir
     cfg.experiment_name = "_".join(cfg.experiment_dir.split("/")[2:])

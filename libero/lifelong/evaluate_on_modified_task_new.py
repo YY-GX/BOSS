@@ -20,7 +20,7 @@ from libero.lifelong.utils import (
 
 from libero.lifelong.main import get_task_embs
 import robomimic.utils.obs_utils as ObsUtils
-from libero.lifelong.algos import get_algo_class
+from libero.lifelong.policy_starter import PolicyStarter
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 from sam.scripts.replacement import OSM_correction, obtain_prompt_from_bddl
@@ -142,7 +142,7 @@ def main():
         os.system(f"mkdir -p {save_dir}")
 
         # Create algo
-        algo = safe_device(get_algo_class(algo_map["base"])(n_tasks, cfg), cfg.device)
+        algo = safe_device(PolicyStarter(n_tasks, cfg), cfg.device)
         algo.policy.load_state_dict(sd)
 
         # Obtain language embs
