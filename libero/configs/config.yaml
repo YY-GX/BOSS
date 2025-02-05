@@ -13,9 +13,8 @@ seed: 10000
 use_wandb: true
 wandb_project: "BOSS Training & Evaluation"
 folder: "./libero/datasets/"
-bddl_folder: null # use default path
-init_states_folder: null # use default path
-load_previous_model: false
+bddl_folder: "./libero/libero/bddl_files"
+init_states_folder: "./libero/libero/init_files"
 device: "cuda:7"
 task_embedding_format: "bert"
 task_embedding_one_hot_offset: 1
