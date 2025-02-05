@@ -58,7 +58,6 @@ def main(hydra_cfg):
     # control seed
     control_seed(cfg.seed)
 
-
     """
     Prepare datasets - demos + language embeddings
     """
