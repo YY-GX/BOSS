@@ -4,8 +4,6 @@ defaults:
   - _self_
   - data: default
   - policy: bc_transformer_policy
-#  - policy: bc_rnn_policy
-#  - policy: bc_vilt_policy
   - train: default
   - eval: default
   - lifelong: base
@@ -13,7 +11,7 @@ defaults:
 
 seed: 10000
 use_wandb: true
-wandb_project: "separate skill learning"
+wandb_project: "BOSS Training & Evaluation"
 folder: null # use default path
 bddl_folder: null # use default path
 init_states_folder: null # use default path
@@ -23,7 +21,7 @@ task_embedding_format: "bert"
 task_embedding_one_hot_offset: 1
 pretrain: false
 pretrain_model_path: ""
-benchmark_name: "libero_90"
+benchmark_name: "boss_44"
 version: "0.0.0"
 # yy: Do you wanna disable skill rollout eval (only do once after all training)?
 is_customize_task: true
