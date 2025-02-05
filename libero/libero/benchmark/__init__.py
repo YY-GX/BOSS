@@ -10,6 +10,11 @@ from libero.libero import get_libero_path
 from libero.libero.benchmark.boss_task_map import boss_task_map\
 
 """
+Create gloabl vars
+"""
+BENCHMARK_MAPPING = {}
+
+"""
 Base class
 """
 
@@ -218,11 +223,6 @@ class LIBERO_90(Benchmark):
         self.name = "libero_90"
         self._make_benchmark()
 
-
-"""
-Create gloabl vars
-"""
-BENCHMARK_MAPPING = {}
 
 """
 Create task_maps

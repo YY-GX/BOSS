@@ -22,7 +22,7 @@ pip install --force-reinstall
 For BC-*, execute the following commands.
 ```shell
 # For BC-RESNET-T
-python lifelong/train_skills.py policy="bc_transformer_policy"
+python libero/lifelong/train_skills.py policy="bc_transformer_policy"
 ```
 For OpenVLA, execute the following commands.
 ```shell
