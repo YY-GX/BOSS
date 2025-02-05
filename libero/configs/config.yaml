@@ -22,8 +22,6 @@ pretrain: false
 pretrain_model_path: ""
 benchmark_name: "boss_44"
 version: "0.0.0"
-# yy: Do you wanna disable skill rollout eval (only do once after all training)?
-is_customize_task: true
 task_num_to_use: null
 
 # BL3 related parameters

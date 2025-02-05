@@ -145,64 +145,18 @@ class PolicyStarter(nn.Module):
             )
             wandb.log({f"task{task_id}/train_loss": training_loss, "epoch": epoch})
 
-
-            if not self.cfg.is_customize_task:
-                if epoch % self.cfg.eval.eval_every == 0:  # evaluate BC loss
-                    # every eval_every epoch, we evaluate the agent on the current task,
-                    # then we pick the best performant agent on the current task as
-                    # if it stops learning after that specific epoch. So the stopping
-                    # criterion for learning a new task is achieving the peak performance
-                    # on the new task. Future work can explore how to decide this stopping
-                    # epoch by also considering the agent's performance on old tasks.
-                    losses.append(training_loss)
-
-                    t0 = time.time()
-
-                    task_str = f"k{task_id}_e{epoch//self.cfg.eval.eval_every}"
-                    sim_states = (
-                        result_summary[task_str] if self.cfg.eval.save_sim_states else None
-                    )
-                    success_rate = evaluate_one_task_success(
-                        cfg=self.cfg,
-                        algo=self,
-                        task=task,
-                        task_emb=task_emb,
-                        task_id=task_id,
-                        sim_states=sim_states,
-                        task_str="",
-                    )
-                    successes.append(success_rate)
-
-                    # yy: save every policy instead of save the best performance one
-                    torch_save_model(self.policy, model_checkpoint_name, cfg=self.cfg)
-                    prev_success_rate = success_rate
-                    idx_at_best_succ = len(losses) - 1
-
-                    t1 = time.time()
-
-                    cumulated_counter += 1.0
-                    ci = confidence_interval(success_rate, self.cfg.eval.n_eval)
-                    tmp_successes = np.array(successes)
-                    tmp_successes[idx_at_best_succ:] = successes[idx_at_best_succ]
-                    print(
-                        f"[info] Epoch: {epoch:3d} | succ: {success_rate:4.2f} ± {ci:4.2f} | best succ: {prev_success_rate} "
-                        + f"| succ. AoC {tmp_successes.sum()/cumulated_counter:4.2f} | time: {(t1-t0)/60:4.2f}",
-                        flush=True,
-                    )
-                    wandb.log({f"task{task_id}/success_rate": success_rate, "epoch": epoch})
-            else:
-                if epoch % self.cfg.eval.eval_every == 0:
-                    t0 = time.time()
-                    if datasets_eval:
-                        L = evaluate_loss(cfg, algo, benchmark, [datasets_eval])
-                    else:
-                        L = evaluate_loss(cfg, algo, benchmark, [dataset])
-                    t1 = time.time()
-                    torch_save_model(self.policy, model_checkpoint_name, cfg=self.cfg)
-                    print(
-                        f"[info] Epoch: {epoch:3d} | eval loss: {training_loss:5.2f} | time: {(t1 - t0) / 60:4.2f}"
-                    )
-                    wandb.log({f"task{task_id}/eval_loss": L, "epoch": epoch})
+            if epoch % self.cfg.eval.eval_every == 0:
+                t0 = time.time()
+                if datasets_eval:
+                    L = evaluate_loss(cfg, algo, benchmark, [datasets_eval])
+                else:
+                    L = evaluate_loss(cfg, algo, benchmark, [dataset])
+                t1 = time.time()
+                torch_save_model(self.policy, model_checkpoint_name, cfg=self.cfg)
+                print(
+                    f"[info] Epoch: {epoch:3d} | eval loss: {training_loss:5.2f} | time: {(t1 - t0) / 60:4.2f}"
+                )
+                wandb.log({f"task{task_id}/eval_loss": L, "epoch": epoch})
 
             if self.scheduler is not None and epoch > 0:
                 self.scheduler.step()
