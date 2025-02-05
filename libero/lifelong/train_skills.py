@@ -66,6 +66,9 @@ def main(hydra_cfg):
 
     if cfg.is_debug:
         n_manip_tasks = 2
+        cfg.train.n_epochs = 2
+        cfg.eval.n_eval = 10
+        cfg.eval.max_steps = 20
 
     # prepare datasets from the benchmark
     manip_datasets = []

@@ -16,6 +16,8 @@ cd ./YourLocation/Libero && pip install -e .
 pip install --force-reinstall 
 ```
 
+TODO: move `datasets` folder and `assets` folder.
+
 # BOSS Benchmark
 
 ## Train skills
