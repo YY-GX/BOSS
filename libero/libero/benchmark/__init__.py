@@ -21,24 +21,20 @@ Base class
 class Benchmark(abc.ABC):
     """A Benchmark."""
 
-    def __init__(self, task_order_index=0, n_tasks_=None):
+    def __init__(self, n_tasks=None):
         self.task_embs = None
-        self.task_order_index = task_order_index
-        self.n_tasks_ = n_tasks_
-        print(f"[INFO] Benchmark task order index: {self.task_order_index}")
+        self.task_indexes = selected_task_indexes[self.name]
+        self.n_tasks = n_tasks
 
     def _make_benchmark(self):
         tasks = list(task_maps[self.name].values())
-        if (self.name == "yy_try"):
-            self.tasks = tasks
+        print(f"[INFO] Using task orders {self.task_indexes}")
+        self.tasks = [tasks[i] for i in self.task_indexes]
+
+        if self.n_tasks:
+            self.n_tasks = self.n_tasks
         else:
-            print(f"[info] using task orders {task_orders[self.task_order_index]}")
-            self.tasks = [tasks[i] for i in task_orders[self.task_order_index]]
-        # yy: set 1 for just traininig 1 task
-        if self.n_tasks_:
-            self.n_tasks = self.n_tasks_
-        else:
-            # if n_tasks_ set to None, it means to use all tasks
+            # if n_tasks set to None, it means to use all tasks
             self.n_tasks = len(self.tasks)
 
     def get_num_tasks(self):
@@ -162,31 +158,31 @@ Register
 
 @register_benchmark
 class BOSS_44(Benchmark):
-    def __init__(self, task_order_index=0, n_tasks_=None):
-        super().__init__(task_order_index=task_order_index, n_tasks_=n_tasks_)
+    def __init__(self, n_tasks=None):
+        super().__init__(n_tasks=n_tasks)
         self.name = "boss_44"
         self._make_benchmark()
 
 @register_benchmark
 class CHALLENGE_1(Benchmark):
-    def __init__(self, task_order_index=0, n_tasks_=None):
-        super().__init__(task_order_index=task_order_index, n_tasks_=n_tasks_)
+    def __init__(self, n_tasks=None):
+        super().__init__(n_tasks=n_tasks)
         self.name = "ch1"
         self._make_benchmark()
 
 
 @register_benchmark
 class CHALLENGE_2_2(Benchmark):
-    def __init__(self, task_order_index=0, n_tasks_=None):
-        super().__init__(task_order_index=task_order_index, n_tasks_=n_tasks_)
+    def __init__(self, n_tasks=None):
+        super().__init__(n_tasks=n_tasks)
         self.name = "ch2_2_modifications"
         self._make_benchmark()
 
 
 @register_benchmark
 class CHALLENGE_2_3(Benchmark):
-    def __init__(self, task_order_index=0, n_tasks_=None):
-        super().__init__(task_order_index=task_order_index, n_tasks_=n_tasks_)
+    def __init__(self, n_tasks=None):
+        super().__init__(n_tasks=n_tasks)
         self.name = "ch2_3_modifications"
         self._make_benchmark()
 
@@ -194,32 +190,32 @@ class CHALLENGE_2_3(Benchmark):
 
 @register_benchmark
 class FACTOR_1(Benchmark):
-    def __init__(self, task_order_index=21, n_tasks_=None):
-        super().__init__(task_order_index=task_order_index, n_tasks_=n_tasks_)
+    def __init__(self, n_tasks=None):
+        super().__init__(n_tasks=n_tasks)
         self.name = "factor_1"
         self._make_benchmark()
 
 
 @register_benchmark
 class FACTOR_2(Benchmark):
-    def __init__(self, task_order_index=22, n_tasks_=None):
-        super().__init__(task_order_index=task_order_index, n_tasks_=n_tasks_)
+    def __init__(self, n_tasks=None):
+        super().__init__(n_tasks=n_tasks)
         self.name = "factor_2"
         self._make_benchmark()
 
 
 @register_benchmark
 class DATA_AUGMENTATION(Benchmark):
-    def __init__(self, task_order_index=23, n_tasks_=None):
-        super().__init__(task_order_index=task_order_index, n_tasks_=n_tasks_)
+    def __init__(self, n_tasks=None):
+        super().__init__(n_tasks=n_tasks)
         self.name = "data_augmentation"
         self._make_benchmark()
 
 
 @register_benchmark
 class LIBERO_90(Benchmark):
-    def __init__(self, task_order_index=28, n_tasks_=None):
-        super().__init__(task_order_index=task_order_index, n_tasks_=n_tasks_)
+    def __init__(self, n_tasks=None):
+        super().__init__(n_tasks=n_tasks)
         self.name = "libero_90"
         self._make_benchmark()
 
