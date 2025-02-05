@@ -56,12 +56,10 @@ def main():
     descriptions = [benchmark.get_task(i).language for i in range(n_tasks)]
     print("======= Tasks Language =======")
     print(f"{descriptions}")
-    print("======= Tasks Language =======")
+    print("==============================")
 
     succ_list = []
     eval_task_id = []
-    # yy: for task_idx in range(n_tasks): will make args.task_num_to_use meaningless and lead to wrong task_idx
-    # for task_idx in range(n_tasks):
     for task_idx, task_id in enumerate(task_id_ls):  # task_id is the actual id of the task. task_idx is just the index.
         print(f">> Evaluate on original Task {task_id}")
         # Obtain useful info from saved model - checkpoints / cfg

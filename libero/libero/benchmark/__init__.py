@@ -3,12 +3,12 @@ import os
 import glob
 import random
 import torch
+import json
 
 from typing import List, NamedTuple, Type
 from libero.libero import get_libero_path
 from libero.libero.benchmark.libero_suite_task_map import libero_task_map
 from libero.libero.benchmark.yy_suite_task_map import yy_task_map
-import json
 
 BENCHMARK_MAPPING = {}
 
@@ -99,8 +99,6 @@ for libero_suite in libero_suites:
             init_states_file=f"{task}.pruned_init",
         )
 
-        # print(language, "\n", f"{task}.bddl", "\n")
-        # print("")
 
 # yy: add my task
 yy_suites = [
@@ -153,7 +151,7 @@ task_orders = [
     # eval ori env (5)
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
     # my method - 1: eval modified env (with midify_back) (6)
-    [1, 11, 18], # TODO
+    [1, 11, 18],
     # eval long horizon tasks (7 ~ 16)
     [2, 3, 5],
     [3, 2, 5],
@@ -183,29 +181,6 @@ task_orders = [
     [0, 1, 2, 3],
     # real libero 90 (28)
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89],
-
-    # old ones
-    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    [4, 6, 8, 7, 3, 1, 2, 0, 9, 5],
-    [6, 3, 5, 0, 4, 2, 9, 1, 8, 7],
-    [7, 4, 3, 0, 8, 1, 2, 5, 9, 6],
-    [4, 5, 6, 3, 8, 0, 2, 7, 1, 9],
-    [1, 2, 3, 0, 6, 9, 5, 7, 4, 8],
-    [3, 7, 8, 1, 6, 2, 9, 4, 0, 5],
-    [4, 2, 9, 7, 6, 8, 5, 1, 3, 0],
-    [1, 8, 5, 4, 0, 9, 6, 7, 2, 3],
-    [8, 3, 6, 4, 9, 5, 1, 2, 0, 7],
-    [6, 9, 0, 5, 7, 1, 2, 8, 3, 4],
-    [6, 8, 3, 1, 0, 2, 5, 9, 7, 4],
-    [8, 0, 6, 9, 4, 1, 7, 3, 2, 5],
-    [3, 8, 6, 4, 2, 5, 0, 7, 1, 9],
-    [7, 1, 5, 6, 3, 2, 8, 9, 4, 0],
-    [2, 0, 9, 5, 3, 6, 8, 7, 1, 4],
-    [3, 5, 9, 6, 2, 4, 8, 7, 1, 0],
-    [7, 6, 5, 9, 0, 3, 4, 2, 8, 1],
-    [2, 5, 0, 9, 3, 1, 6, 4, 8, 7],
-    [3, 5, 1, 2, 7, 8, 6, 0, 4, 9],
-    [3, 4, 1, 9, 7, 6, 8, 2, 0, 5],
 ]
 
 
@@ -221,9 +196,6 @@ class Benchmark(abc.ABC):
 
     def _make_benchmark(self):
         tasks = list(task_maps[self.name].values())
-        # yy: I changed this
-        # if (self.name == "libero_90") or (self.name == "yy_try") or (self.name == "modified_libero"):
-        #     self.tasks = tasks
         if (self.name == "yy_try"):
             self.tasks = tasks
         else:
