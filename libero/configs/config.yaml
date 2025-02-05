@@ -12,7 +12,7 @@ defaults:
 seed: 10000
 use_wandb: true
 wandb_project: "BOSS Training & Evaluation"
-folder: null # use default path
+folder: "./libero/datasets/"
 bddl_folder: null # use default path
 init_states_folder: null # use default path
 load_previous_model: false
