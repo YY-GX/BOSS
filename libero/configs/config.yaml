@@ -21,7 +21,8 @@ task_embedding_one_hot_offset: 1
 pretrain: false
 pretrain_model_path: ""
 benchmark_name: "boss_44"
-version: "0.0.0"
+#version: "0.0.0"
+version: "history_length"
 task_num_to_use: null
 
 # BL3 related parameters
@@ -41,5 +42,4 @@ bl3_mapping: "bl3_all.json"
 only_success: true
 ratio: 1.0
 
-
-is_debug: true
+is_debug: false

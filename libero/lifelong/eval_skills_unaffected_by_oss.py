@@ -6,7 +6,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 import numpy as np
 import torch
 from libero.libero import get_libero_path
-from libero.libero.benchmark import get_benchmark, task_orders
+from libero.libero.benchmark import get_benchmark
 from libero.libero.envs import OffScreenRenderEnv, SubprocVectorEnv
 from libero.libero.utils.time_utils import Timer
 from libero.libero.utils.video_utils import VideoWriter
@@ -27,18 +27,15 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Evaluation Script")
-    parser.add_argument("--model_path_folder", type=str, default="/mnt/arc/yygx/pkgs_baselines/LIBERO/libero/experiments/libero_90/training_eval_skills_original_env/Sequential/BCRNNPolicy_seed10000/all/")
+    parser = argparse.ArgumentParser(description="Evaluation on original skills")
+    parser.add_argument("--model_path_folder", type=str, default="./experiments/boss_44/0.0.0/BCTransformerPolicy_seed10000/run_001/", required=True)
     parser.add_argument(
         "--benchmark",
         type=str,
         required=True,
-        choices=["libero_10", "libero_90", "libero_spatial", "libero_object", "libero_goal", "yy_try",
-                 "modified_libero", "single_step"],
-        default="libero_90"
+        choices=["boss_44", "ch1", "ch2_2_modifications", "ch2_3_modifications", "factor_1", "factor_2", "libero_90",],
+        default="boss_44"
     )
-    parser.add_argument("--task_order_index", type=int, default=5)
-    parser.add_argument("--task_num_to_use", type=int, default=20)
     parser.add_argument("--seed", type=int, required=True, default=10000)
     parser.add_argument("--device_id", type=int, default=0)
     args = parser.parse_args()
@@ -50,9 +47,9 @@ def main():
     args = parse_args()
     
     # Get the benchmarks
-    benchmark = get_benchmark(args.benchmark)(n_tasks=args.task_num_to_use)
+    benchmark = get_benchmark(args.benchmark)()
     n_tasks = benchmark.n_tasks
-    task_id_ls = task_orders[args.task_order_index]
+    task_id_ls = benchmark.task_indexes
 
     # Obtain language descriptions
     descriptions = [benchmark.get_task(i).language for i in range(n_tasks)]
@@ -62,7 +59,7 @@ def main():
 
     succ_list = []
     eval_task_id = []
-    for task_idx, task_id in enumerate(task_id_ls):  # task_id is the actual id of the task. task_idx is just the index.
+    for idx, task_id in enumerate(task_id_ls):  # task_id is the actual id of the task. idx is just the index.
         print(f">> Evaluate on original Task {task_id}")
         # Obtain useful info from saved model - checkpoints / cfg
         model_index = task_id
@@ -93,7 +90,7 @@ def main():
         # Obtain language embs & task
         task_embs = get_task_embs(cfg, descriptions)
         benchmark.set_task_embs(task_embs)
-        task = benchmark.get_task(task_idx)
+        task = benchmark.get_task(idx)
     
         """
         Start Evaluation
@@ -145,7 +142,7 @@ def main():
             dones = [False] * env_num
             steps = 0
             obs = env.set_init_state(init_states_)
-            task_emb = benchmark.get_task_emb(task_idx)
+            task_emb = benchmark.get_task_emb(idx)
     
             num_success = 0
             for _ in range(5):  # simulate the physics without any actions

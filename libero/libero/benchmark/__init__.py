@@ -10,7 +10,7 @@ from libero.libero import get_libero_path
 from libero.libero.benchmark.boss_task_map import boss_task_map\
 
 """
-Create gloabl vars
+Create global vars
 """
 BENCHMARK_MAPPING = {}
 
@@ -126,10 +126,12 @@ def create_reverse_mapping(mapping):
             reverse_mapping.setdefault(value, []).append(key)
     return reverse_mapping
 
+
 def find_keys_by_value(mapping, target_value):
     """Find all keys associated with a given value in the mapping."""
     reverse_mapping = create_reverse_mapping(mapping)
     return reverse_mapping.get(target_value, [])
+
 
 def grab_language_from_filename(x, is_modified=False):
     if is_modified:
