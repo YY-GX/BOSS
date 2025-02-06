@@ -58,6 +58,7 @@ def parse_args():
     )
     parser.add_argument("--seed", type=int, required=True)
     parser.add_argument("--device_id", type=int)
+    parser.add_argument("--is_debug", type=int, default=1)
     parser.add_argument("--is_wrist_camera_view", type=int, default=0)
     args = parser.parse_args()
     args.device_id = "cuda:" + str(args.device_id)
@@ -72,7 +73,10 @@ def main():
         mapping = json.load(json_file)
     
     # Get the benchmarks
-    benchmark = get_benchmark(args.benchmark)()
+    if args.is_debug:
+        benchmark = get_benchmark(args.benchmark)(n_tasks=1)
+    else:
+        benchmark = get_benchmark(args.benchmark)()
     n_tasks = benchmark.n_tasks
     task_id_ls = benchmark.task_indexes
 

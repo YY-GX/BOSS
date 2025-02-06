@@ -38,6 +38,7 @@ def parse_args():
     )
     parser.add_argument("--seed", type=int, required=True, default=10000)
     parser.add_argument("--device_id", type=int, default=0)
+    parser.add_argument("--is_debug", type=int, default=1)
     args = parser.parse_args()
     args.device_id = "cuda:" + str(args.device_id)
     return args
@@ -47,7 +48,10 @@ def main():
     args = parse_args()
     
     # Get the benchmarks
-    benchmark = get_benchmark(args.benchmark)()
+    if args.is_debug:
+        benchmark = get_benchmark(args.benchmark)(n_tasks=1)
+    else:
+        benchmark = get_benchmark(args.benchmark)()
     n_tasks = benchmark.n_tasks
     task_id_ls = benchmark.task_indexes
 
