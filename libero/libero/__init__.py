@@ -2,10 +2,10 @@ import os
 import yaml
 
 # This is a default path for localizing all the benchmark related files
-libero_config_path = os.environ.get(
-    "LIBERO_CONFIG_PATH", os.path.expanduser("~/.libero")
+boss_config_path = os.environ.get(
+    "BOSS_CONFIG_PATH", os.path.expanduser("./.boss")
 )
-config_file = os.path.join(libero_config_path, "config.yaml")
+config_file = os.path.join(boss_config_path, "config.yaml")
 
 
 def get_default_path_dict(custom_location=None):
@@ -59,8 +59,8 @@ def set_libero_default_path(custom_location=os.path.dirname(os.path.abspath(__fi
         yaml.dump(new_config, f)
 
 
-if not os.path.exists(libero_config_path):
-    os.makedirs(libero_config_path)
+if not os.path.exists(boss_config_path):
+    os.makedirs(boss_config_path)
 
 if not os.path.exists(config_file):
     # Create a default config file
