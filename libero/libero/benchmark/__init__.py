@@ -165,7 +165,7 @@ class BOSS_44(Benchmark):
         self._make_benchmark()
 
 @register_benchmark
-class CHALLENGE_1(Benchmark):
+class CH1(Benchmark):
     def __init__(self, n_tasks=None):
         self.name = "ch1"
         super().__init__(n_tasks=n_tasks)
@@ -173,7 +173,7 @@ class CHALLENGE_1(Benchmark):
 
 
 @register_benchmark
-class CHALLENGE_2_2(Benchmark):
+class CH2_2_MODIFICATIONS(Benchmark):
     def __init__(self, n_tasks=None):
         self.name = "ch2_2_modifications"
         super().__init__(n_tasks=n_tasks)
@@ -181,7 +181,7 @@ class CHALLENGE_2_2(Benchmark):
 
 
 @register_benchmark
-class CHALLENGE_2_3(Benchmark):
+class CH2_3_MODIFICATIONS(Benchmark):
     def __init__(self, n_tasks=None):
         self.name = "ch2_3_modifications"
         super().__init__(n_tasks=n_tasks)
