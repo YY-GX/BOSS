@@ -28,6 +28,9 @@ class Benchmark(abc.ABC):
 
     def _make_benchmark(self):
         tasks = list(task_maps[self.name].values())
+        if self.name in eval_ori_suites:
+            tasks = sorted(tasks, key=lambda item: item["name"])
+
         print(f"[INFO] Task orders in current set: {self.task_indexes}")
         self.tasks = [tasks[i] for i in self.task_indexes]
 
@@ -221,6 +224,37 @@ class LIBERO_90(Benchmark):
         self._make_benchmark()
 
 
+@register_benchmark
+class G1(Benchmark):
+    def __init__(self, n_tasks=None):
+        self.name = "g1"
+        super().__init__(n_tasks=n_tasks)
+        self._make_benchmark()
+
+
+@register_benchmark
+class G2(Benchmark):
+    def __init__(self, n_tasks=None):
+        self.name = "g2"
+        super().__init__(n_tasks=n_tasks)
+        self._make_benchmark()
+
+
+@register_benchmark
+class G3(Benchmark):
+    def __init__(self, n_tasks=None):
+        self.name = "g3"
+        super().__init__(n_tasks=n_tasks)
+        self._make_benchmark()
+
+
+@register_benchmark
+class G4(Benchmark):
+    def __init__(self, n_tasks=None):
+        self.name = "g4"
+        super().__init__(n_tasks=n_tasks)
+        self._make_benchmark()
+
 """
 Create task_maps
 """
@@ -234,6 +268,7 @@ boss_suites = [
     "data_augmentation",
     "libero_90",
 ]
+
 task_maps = {}
 max_len = 0
 keep_language_unchanged = True
@@ -261,6 +296,15 @@ for boss_suite in boss_suites:
             init_states_file=f"{task}.pruned_init",
         )
 
+eval_ori_suites = [
+    "g1",
+    "g2",
+    "g3",
+    "g4",
+]
+
+for ori_suite in eval_ori_suites:
+    task_maps[ori_suite] = task_maps["libero_90"].copy()
 
 
 """
@@ -287,57 +331,10 @@ selected_task_indexes = {
     "factor_2": [i for i in range(0, 20)],
     "data_augmentation": list(range(0, 1727)),
     "libero_90": [i for i in range(0, 90)],
+    "g1": [22, 13, 42, 7, 39, 62, 37, 84, 51, 31, 79, 18, 10, 52, 3, 40, 45, 64, 0, 72],
+    "g2": [7, 19, 88, 29, 67, 86, 61, 63, 56, 25, 26, 64, 18, 83, 4, 60, 71, 15, 45, 66],
+    "g3": [39, 22, 61, 84, 49, 89, 51, 47, 6, 85, 0, 82, 50, 26, 57, 23, 17, 74, 83, 55],
+    "g4": [39, 49, 20, 61, 31, 89, 13, 6, 67, 1, 41, 57, 30, 80, 77, 5, 23, 54, 55, 38],
 }
-
-
-
-
-
-# bl3_all_task_order = list(range(0, 1727))
-#
-# task_orders = [
-#     # train skills (0 ~ 3)
-#     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43],
-#     [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43],  # transformer
-#     [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43],  # rnn
-#     [37, 38, 39, 40, 41, 42, 43],  # vilt
-#     # eval_modified_env (4)
-#     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22],
-#     # eval ori env (5)
-#     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
-#     # my method - 1: eval modified env (with midify_back) (6)
-#     [1, 11, 18],
-#     # eval long horizon tasks (7 ~ 16)
-#     [2, 3, 5],
-#     [3, 2, 5],
-#     [6, 7, 10],
-#     [6, 8, 10],
-#     [19, 18, 16],
-#     [19, 16, 18],
-#     [17, 16, 20],
-#     [20, 17, 16],
-#     [32, 35, 36],
-#     [34, 35, 36],
-#     # speed up training (17 ~ 20)
-#     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-#     [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
-#     [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
-#     [33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43],
-#     # ablation-1 (21)
-#     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
-#     # ablation-2 (22)
-#     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
-#     # bl3_all (23)
-#     bl3_all_task_order,
-#     # diffusion policy - 1 (24)
-#     [4],
-#     [3],
-#     [0],
-#     [0, 1, 2, 3],
-#     # real libero 90 (28)
-#     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89],
-# ]
-
-
 
 

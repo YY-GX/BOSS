@@ -79,7 +79,7 @@ def main():
     descriptions = [benchmark.get_task(i).language for i in range(n_tasks)]
     print("======= Tasks Language =======")
     print(f"{descriptions}")
-    print("======= Tasks Language =======")
+    print("==============================")
 
     succ_list = []
     eval_task_id = []
