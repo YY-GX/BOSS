@@ -22,12 +22,7 @@ import robomimic.utils.obs_utils as ObsUtils
 from libero.lifelong.policy_starter import PolicyStarter
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
-from sam.scripts.replacement import OSM_correction, obtain_prompt_from_bddl
-from PIL import Image
-from skimage.transform import resize
-from torchvision.utils import save_image
 from pathlib import Path
-from PIL import Image
 import json
 
 
