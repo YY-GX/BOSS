@@ -29,7 +29,7 @@ class Benchmark(abc.ABC):
     def _make_benchmark(self):
         tasks = list(task_maps[self.name].values())
         if self.name in eval_ori_suites:
-            tasks = sorted(tasks, key=lambda item: item["name"])
+            tasks = sorted(tasks, key=lambda item: item.name)
 
         print(f"[INFO] Task orders in current set: {self.task_indexes}")
         self.tasks = [tasks[i] for i in self.task_indexes]
