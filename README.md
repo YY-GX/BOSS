@@ -33,8 +33,15 @@ For OpenVLA, execute the following commands.
 
 ## Challenge 1
 ```shell
+# Test BC-RESNET-T when unaffected by OSS
 python libero/lifelong/eval_skills_unaffected_by_oss.py \
 --benchmark "boss_44" \
+--model_path_folder "./experiments/boss_44/0.0.0/BCTransformerPolicy_seed10000/run_001/" \
+--seed 10000
+
+# Test BC-RESNET-T when affected by OSS
+python libero/lifelong/eval_skills_affected_by_oss.py \
+--benchmark "ch1" \
 --model_path_folder "./experiments/boss_44/0.0.0/BCTransformerPolicy_seed10000/run_001/" \
 --seed 10000
 ```
