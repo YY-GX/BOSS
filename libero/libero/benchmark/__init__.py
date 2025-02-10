@@ -31,7 +31,7 @@ class Benchmark(abc.ABC):
         if self.name in eval_ori_suites:
             tasks = sorted(tasks, key=lambda item: item.name)
 
-        print(f"[INFO] Task orders in current set: {self.task_indexes}")
+        print(f"[INFO] Task indexes in current set: {self.task_indexes}")
         self.tasks = [tasks[i] for i in self.task_indexes]
 
         if self.n_tasks:
@@ -224,36 +224,66 @@ class LIBERO_90(Benchmark):
         self._make_benchmark()
 
 
-@register_benchmark
-class G1(Benchmark):
-    def __init__(self, n_tasks=None):
-        self.name = "g1"
-        super().__init__(n_tasks=n_tasks)
-        self._make_benchmark()
+# @register_benchmark
+# class G1(Benchmark):
+#     def __init__(self, n_tasks=None):
+#         self.name = "g1"
+#         super().__init__(n_tasks=n_tasks)
+#         self._make_benchmark()
+#
+#
+# @register_benchmark
+# class G2(Benchmark):
+#     def __init__(self, n_tasks=None):
+#         self.name = "g2"
+#         super().__init__(n_tasks=n_tasks)
+#         self._make_benchmark()
+#
+#
+# @register_benchmark
+# class G3(Benchmark):
+#     def __init__(self, n_tasks=None):
+#         self.name = "g3"
+#         super().__init__(n_tasks=n_tasks)
+#         self._make_benchmark()
+#
+#
+# @register_benchmark
+# class G4(Benchmark):
+#     def __init__(self, n_tasks=None):
+#         self.name = "g4"
+#         super().__init__(n_tasks=n_tasks)
+#         self._make_benchmark()
 
 
-@register_benchmark
-class G2(Benchmark):
-    def __init__(self, n_tasks=None):
-        self.name = "g2"
-        super().__init__(n_tasks=n_tasks)
-        self._make_benchmark()
+def create_benchmark_class(name):
+    """Dynamically creates a Benchmark subclass with a given name."""
+    return type(
+        name,
+        (Benchmark,),
+        {
+            "__init__": lambda self, n_tasks=None, name=name: (
+                setattr(self, "name", name),
+                super(self.__class__, self).__init__(n_tasks=n_tasks),
+                self._make_benchmark(),
+            )[0]
+        }
+    )
+
+def register_benchmark_classes(prefix, start, end):
+    """Generates and registers benchmark classes dynamically."""
+    for i in range(start, end + 1):
+        class_name = f"{prefix}{i}"
+        globals()[class_name] = create_benchmark_class(class_name.lower())  # Assign dynamically
+        register_benchmark(globals()[class_name])  # Register each class
+
+# Generate and register CH3_1 to CH3_10
+register_benchmark_classes("CH3_", 1, 10)
+
+# Generate and register G1 to G4
+register_benchmark_classes("G", 1, 4)
 
 
-@register_benchmark
-class G3(Benchmark):
-    def __init__(self, n_tasks=None):
-        self.name = "g3"
-        super().__init__(n_tasks=n_tasks)
-        self._make_benchmark()
-
-
-@register_benchmark
-class G4(Benchmark):
-    def __init__(self, n_tasks=None):
-        self.name = "g4"
-        super().__init__(n_tasks=n_tasks)
-        self._make_benchmark()
 
 """
 Create task_maps
@@ -296,6 +326,24 @@ for boss_suite in boss_suites:
             init_states_file=f"{task}.pruned_init",
         )
 
+
+ch3_suites = [
+    "ch3_1",
+    "ch3_2",
+    "ch3_3",
+    "ch3_4",
+    "ch3_5",
+    "ch3_6",
+    "ch3_7",
+    "ch3_8",
+    "ch3_9",
+    "ch3_10",
+]
+
+for ch3_suite in ch3_suites:
+    task_maps[ch3_suite] = task_maps["boss_44"].copy()
+
+
 eval_ori_suites = [
     "g1",
     "g2",
@@ -307,6 +355,8 @@ for ori_suite in eval_ori_suites:
     task_maps[ori_suite] = task_maps["libero_90"].copy()
 
 
+
+
 """
 Created Tasks Indexes
 """
@@ -315,18 +365,16 @@ selected_task_indexes = {
     "ch1": [i for i in range(0, 44)],
     "ch2_2_modifications": [i for i in range(0, 44)],
     "ch2_3_modifications": [i for i in range(0, 44)],
-    "ch3": [
-        [2, 3, 5],
-        [3, 2, 5],
-        [6, 7, 10],
-        [6, 8, 10],
-        [19, 18, 16],
-        [19, 16, 18],
-        [17, 16, 20],
-        [20, 17, 16],
-        [32, 35, 36],
-        [34, 35, 36],
-    ],
+    "ch3_1": [2, 3, 5],
+    "ch3_2": [3, 2, 5],
+    "ch3_3": [6, 7, 10],
+    "ch3_4": [6, 8, 10],
+    "ch3_5": [19, 18, 16],
+    "ch3_6": [19, 16, 18],
+    "ch3_7": [17, 16, 20],
+    "ch3_8": [20, 17, 16],
+    "ch3_9": [32, 35, 36],
+    "ch3_10": [34, 35, 36],
     "factor_1": [i for i in range(0, 34)],
     "factor_2": [i for i in range(0, 20)],
     "data_augmentation": list(range(0, 1727)),

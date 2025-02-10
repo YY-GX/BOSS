@@ -97,7 +97,7 @@ def main():
     Preparation for Evaluation
     """
     # Get the benchmarks
-    benchmark = get_benchmark(args.benchmark)()
+    benchmark = get_benchmark(args.benchmark)(args.task_order_index)
     n_tasks = benchmark.n_tasks
     task_id_ls = task_orders[args.task_order_index]
     task_idx_ls = [i for i in range(len(task_id_ls))]

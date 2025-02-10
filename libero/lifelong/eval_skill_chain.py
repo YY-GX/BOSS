@@ -2,71 +2,38 @@ import argparse
 import sys
 import os
 
-# TODO: find a better way for this?
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
-import hydra
-import json
-import numpy as np
-import pprint
-import time
-import torch
-import wandb
-import yaml
-from easydict import EasyDict
-from hydra.utils import get_original_cwd, to_absolute_path
-from omegaconf import DictConfig, OmegaConf
-from torch.utils.data import DataLoader
-from transformers import AutoModel, pipeline, AutoTokenizer, logging
-from pathlib import Path
+# TODO:
+#  1. pretrained model
+#  2. initial states set
+#  3. change to for loop to iterate tasks
 
+
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+import numpy as np
+import torch
 from libero.libero import get_libero_path
-from libero.libero.benchmark import get_benchmark
+from libero.libero.benchmark import get_benchmark, task_orders
 from libero.libero.envs import OffScreenRenderEnv, SubprocVectorEnv, SequentialEnv
 from libero.libero.utils.time_utils import Timer
 from libero.libero.utils.video_utils import VideoWriter
-from libero.lifelong.algos import *
-from libero.lifelong.datasets import get_dataset, SequenceVLDataset, GroupedTaskDataset
 from libero.lifelong.metric import (
-    evaluate_loss,
-    evaluate_success,
     raw_obs_to_tensor_obs,
 )
 from libero.lifelong.utils import (
-    control_seed,
     safe_device,
     torch_load_model,
-    NpEncoder,
-    compute_flops,
 )
 
 from libero.lifelong.main import get_task_embs
-
 import robomimic.utils.obs_utils as ObsUtils
-import robomimic.utils.tensor_utils as TensorUtils
-
+from libero.lifelong.policy_starter import PolicyStarter
+import warnings
+import pickle
+import wandb
 import time
-import ast
-import time
-from contextlib import contextmanager
-from PIL import Image
+import copy
 
-@contextmanager
-def timeit():
-    start_time = time.time()
-    yield
-    end_time = time.time()
-    print(f"Elapsed time: {end_time - start_time:.2f} seconds")
-
-
-
-
-benchmark_map = {
-    "libero_10": "LIBERO_10",
-    "libero_90": "LIBERO_90",
-    "libero_spatial": "LIBERO_SPATIAL",
-    "libero_object": "LIBERO_OBJECT",
-    "libero_goal": "LIBERO_GOAL",
-}
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 algo_map = {
     "base": "Sequential",
@@ -76,11 +43,17 @@ algo_map = {
     "multitask": "Multitask",
 }
 
-policy_map = {
-    "bc_rnn_policy": "BCRNNPolicy",
-    "bc_transformer_policy": "BCTransformerPolicy",
-    "bc_vilt_policy": "BCViLTPolicy",
-}
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Evaluation Script")
+    parser.add_argument("--model_path_folder", type=str,
+                        default="/mnt/arc/yygx/pkgs_baselines/LIBERO/libero/experiments/libero_90/training_eval_skills_original_env/Sequential/BCRNNPolicy_seed10000/all/")
+    parser.add_argument("--task_order_index", type=int, default=5)
+    parser.add_argument("--seed", type=int, required=True, default=10000)
+    parser.add_argument("--device_id", type=int, default=0)
+    args = parser.parse_args()
+    args.device_id = "cuda:" + str(args.device_id)
+    return args
 
 
 def initialize_robot_state(crr_state, robot_init_sim_state):
@@ -93,319 +66,242 @@ def initialize_robot_state(crr_state, robot_init_sim_state):
     return modified_state
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(description="Evaluation Script")
-    parser.add_argument("--experiment_dir", type=str, default="experiments")
-    # for which task suite
-    parser.add_argument(
-        "--benchmark",
-        type=str,
-        required=True,
-        choices=["libero_10", "libero_spatial", "libero_object", "libero_goal", "libero_90"],
-    )
-    # parser.add_argument("--task_id", type=int, required=True)
-    # yy: load task ids that you want to execute in sequence
-    parser.add_argument("--task_id_ls", type=str, required=True)
-    # method detail
-    parser.add_argument(
-        "--algo",
-        type=str,
-        required=True,
-        choices=["base", "er", "ewc", "packnet", "multitask"],
-    )
-    parser.add_argument(
-        "--policy",
-        type=str,
-        required=True,
-        choices=["bc_rnn_policy", "bc_transformer_policy", "bc_vilt_policy"],
-    )
-    parser.add_argument("--is_local_eval", type=int, required=True, default=1)
-    parser.add_argument("--seed", type=int, required=True)
-    # parser.add_argument("--load_task_ls", type=int, required=True)
-    # parser.add_argument("--load_task", type=int)
-    parser.add_argument("--ep", type=int)
-    parser.add_argument("--device_id", type=int)
-    parser.add_argument("--save-videos", action="store_true")
-    # parser.add_argument('--save_dir',  type=str, required=True)
-    args = parser.parse_args()
-    args.device_id = "cuda:" + str(args.device_id)
-    args.save_dir = f"{args.experiment_dir}_saved"
-
-    if args.algo == "multitask":
-        assert args.ep in list(
-            range(0, 50, 5)
-        ), "[error] ep should be in [0, 5, ..., 50]"
-    else:
-        # assert args.load_task in list(
-        #     range(10)
-        # ), "[error] load_task should be in [0, ..., 9]"
-        assert type(ast.literal_eval(args.task_id_ls)) == list
-    return args
+def reset_env_init_states(env, obs, info, init_states_ls, env_num, task_indexes):
+    obs_ls = []
+    for k in range(env_num):
+        if info[k]['is_init']:
+            # yy: next task's initial state is extracted,
+            #  and then passed to be modifed as I only wanna change robot related state
+            init_state_ = initialize_robot_state(env.get_sim_state()[k], init_states_ls[task_indexes[k]][k, :])[
+                None, ...]
+            obs_ = env.set_init_state(init_state_, k)
+            obs_ls.append(obs_[0])
+        else:
+            obs_ = obs[k]
+            obs_ls.append(obs_)
+    obs = np.stack(obs_ls)
+    return obs
 
 
 def main():
     args = parse_args()
-    # e.g., experiments/LIBERO_SPATIAL/Multitask/BCRNNPolicy_seed100/
-    # yy: make the str a list
-    args.task_id_ls = ast.literal_eval(args.task_id_ls)
+    """
+    Preparation for Evaluation
+    """
+    # Get the benchmarks
+    benchmark = get_benchmark("boss_44")(args.task_order_index)
+    n_tasks = benchmark.n_tasks
+    task_id_ls = task_orders[args.task_order_index]
+    task_idx_ls = [i for i in range(len(task_id_ls))]
 
-    experiment_dir = os.path.join(
-        args.experiment_dir,
-        f"{args.benchmark}/"
-        + f"{algo_map[args.algo]}/"
-        + f"{policy_map[args.policy]}_seed{args.seed}",
-    )
+    # Obtain language descriptions
+    descriptions = [benchmark.get_task(i).language for i in range(n_tasks)]
+    print("======= Tasks Language =======")
+    print(f"{descriptions}")
+    print("======= Tasks Language =======")
 
-    # find the checkpoint
-    experiment_id = 0
-    for path in Path(experiment_dir).glob("run_*"):
-        if not path.is_dir():
+    save_dir = os.path.join(args.model_path_folder, f"long_horizon_task_id{args.task_order_index}_seed{args.seed}")
+    print(f">> Create folder {save_dir}")
+    os.system(f"mkdir -p {save_dir}")
+
+    # yy: For collecting necessary list of items
+    # For sequential env, need to obtain: cfg_ls, algo_ls, initial_states_ls
+    cfg_ls, algo_ls, init_states_ls, task_ls = [], [], [], []
+    task_embs = []
+    for task_idx, task_id in enumerate(task_id_ls):  # task_id is the actual id of the task. task_idx is just the index.
+        print(f">> Evaluate on original Task {task_id}")
+        # Obtain useful info from saved model - checkpoints / cfg
+        model_index = task_id
+        model_path = args.model_path_folder
+        model_path = os.path.join(model_path, f"task{model_index}_model.pth")
+        if not os.path.exists(model_path):
+            print(f">> {model_path} does NOT exist!")
+            print(f">> Env_{task_id} evaluation fails.")
             continue
-        try:
-            # yy: obtain the newest one
-            folder_id = int(str(path).split("run_")[-1])
-            if folder_id > experiment_id:
-                experiment_id = folder_id
-        except BaseException:
-            pass
-    if experiment_id == 0:
-        print(f"[error] cannot find the checkpoint under {experiment_dir}")
-        sys.exit(0)
-
-    run_folder = os.path.join(experiment_dir, f"run_{experiment_id:03d}")
-
-
-    # yy: load a list of policies, in order to execute these tasks in sequence
-    checkpoints_ls = []
-    cfg_ls = []
-    for i, task_id in enumerate(args.task_id_ls):
-        model_path = os.path.join(run_folder, f"task{task_id}_model.pth")
-        sd, cfg, _ = torch_load_model(
+        sd, cfg, previous_mask = torch_load_model(
             model_path, map_location=args.device_id
         )
-        checkpoints_ls.append(sd)
+
+        # Modify some attributes of cfg via args
+        cfg.benchmark_name = "boss_44"
+        cfg.folder = get_libero_path("datasets")
+        cfg.bddl_folder = get_libero_path("bddl_files")
+        cfg.init_states_folder = get_libero_path("init_states")
+        cfg.device = args.device_id
+        # yy: cfg_ls here
         cfg_ls.append(cfg)
-    cfg = cfg_ls[0]
-    # try:
-    #     if args.algo == "multitask":
-    #         model_path = os.path.join(run_folder, f"multitask_model_ep{args.ep}.pth")
-    #         sd, cfg, previous_mask = torch_load_model(
-    #             model_path, map_location=args.device_id
-    #         )
-    #     else:
-    #         # yy: load a list of policies, in order to execute these tasks in sequence
-    #         checkpoints_ls = []
-    #         cfg_ls = []
-    #         for i, task_id in enumerate(args.task_id_ls):
-    #             model_path = os.path.join(run_folder, f"task{task_id}_model.pth")
-    #             sd, cfg, _ = torch_load_model(
-    #                 model_path, map_location=args.device_id
-    #             )
-    #             checkpoints_ls.append(sd)
-    #             cfg_ls.append(cfg)
-    #         cfg = cfg_ls[0]
-    #
-    # except:
-    #     print(f"[error] cannot find the checkpoint at {str(model_path)}")
-    #     sys.exit(0)
 
-    # yy: these are folders, which shall be the same for all tasks
-    cfg.folder = get_libero_path("datasets")
-    cfg.bddl_folder = get_libero_path("bddl_files")
-    cfg.init_states_folder = get_libero_path("init_states")
-    cfg.device = args.device_id
-
-    algo_ls = []
-    for i, task_id in enumerate(args.task_id_ls):
-        algo = safe_device(eval(algo_map[args.algo])(10, cfg), cfg.device)
-        # algo.policy.previous_mask = previous_mask
-        algo.policy.load_state_dict(checkpoints_ls[i])
+        # Create algo
+        algo = safe_device(PolicyStarter(n_tasks, cfg), cfg.device)
+        algo.policy.load_state_dict(sd)
         algo.eval()
-        algo.reset()
-        algo_ls.append(algo)
+        # yy: algo_ls here
+        algo_ls.append([copy.deepcopy(algo) for _ in range(cfg['eval']['n_eval'])])
 
-    if not hasattr(cfg.data, "task_order_index"):
-        cfg.data.task_order_index = 0
+        # Obtain language embs & task
+        task_embs += get_task_embs(cfg, descriptions)
+        benchmark.set_task_embs(task_embs)
+        task = benchmark.get_task(task_idx)
+        # yy: task_ls here
+        task_ls.append(task)
 
-    # get the benchmark the task belongs to
-    benchmark = get_benchmark(cfg.benchmark_name)(cfg.data.task_order_index)
-    descriptions = [benchmark.get_task(i).language for i in range(10)]  # yy: why 10? cuz load_task_id is from 0 - 9.
-    task_embs = get_task_embs(cfg, descriptions)
-    benchmark.set_task_embs(task_embs)
+        init_states_path = os.path.join(
+            cfg.init_states_folder, task.problem_folder, task.init_states_file
+        )
+        init_states = torch.load(init_states_path)
+        indices = np.arange(cfg['eval']['n_eval']) % init_states.shape[0]
+        # yy: init_states_ls here
+        init_states_ls.append(init_states[indices])  # each element with shape [env_num, ...]
 
-    # yy: task is sth like:
+
+
     """
-    Task(
-            name=task,
-            language=language,
-            problem="Libero",
-            problem_folder=libero_suite,
-            bddl_file=f"{task}.bddl",
-            init_states_file=f"{task}.pruned_init",
-        )
+    Start Evaluation
     """
-    task = benchmark.get_task(args.task_id_ls[0])
+    cfg = cfg_ls[0]
+    eval_task_id = []
+    ObsUtils.initialize_obs_utils_with_obs_specs({"obs": cfg.data.obs.modality})
 
-    ### ======================= start evaluation ============================
-
-    # yy: just use get_dataset() to do some necessary initilization
-    dataset, shape_meta = get_dataset(
-        dataset_path=os.path.join(
-            cfg.folder, benchmark.get_task_demonstration(args.task_id_ls[0])
-        ),
-        obs_modality=cfg.data.obs.modality,
-        initialize_obs_utils=True,
-        seq_len=cfg.data.seq_len,
+    save_stats_pth = os.path.join(
+        save_dir,
+        f"long_horizon_task_{str(task_id_ls)}.stats",
     )
-    dataset = GroupedTaskDataset(
-        [dataset], task_embs[args.task_id_ls[0]: args.task_id_ls[0] + 1]
-    )
-
-
-    test_loss = 0.0
-
-    # evaluate success rate
-    if args.algo == "multitask":
-        save_folder = os.path.join(
-            args.save_dir,
-            f"{args.benchmark}_{args.algo}_{args.policy}_{args.seed}_ep{args.ep}_on{args.task_id}.stats",
-        )
-    else:
-        save_folder = os.path.join(
-            args.save_dir,
-            f"{args.benchmark}_{args.algo}_{args.policy}_{args.seed}_eval_skill_chain.stats",
-        )
 
     video_folder = os.path.join(
-        args.save_dir,
-        f"{args.benchmark}_{args.algo}_{args.policy}_{args.seed}_eval_skill_chain_videos",
+        save_dir,
+        f"long_horizon_task_{str(task_id_ls)}_videos",
     )
 
-    with Timer() as t, VideoWriter(video_folder, args.save_videos) as video_writer:
-        # yy: here is where the env is defined <= comes from task.bddl_file
-        # yy: cfg.bddl_folder -> "bddl_files"; task.problem_folder -> "libero_90"; task.bddl_file -> sth like: "KITCHEN_SCENE10_close_the_top_drawer_of_the_cabinet"
+    os.system(f"mkdir -p {video_folder}")
+
+    with Timer() as t:
+        # yy: video recorder preparation
+        video_writer_agentview = VideoWriter(os.path.join(video_folder, "agentview"), save_video=True,
+                                             single_video=False)
+        video_writer_wristcameraview = VideoWriter(os.path.join(video_folder, "wristcameraview"), save_video=True,
+                                                   single_video=False)
+
+        # yy: env preparation
         env_args = {
-            "bddl_file_name": [os.path.join(
-                cfg_.bddl_folder, benchmark.get_task(args.task_id_ls[i]).problem_folder,
-                benchmark.get_task(args.task_id_ls[i]).bddl_file
-            ) for i, cfg_ in enumerate(cfg_ls)],
-            "camera_heights": [cfg_.data.img_h for i, cfg_ in enumerate(cfg_ls)],
-            "camera_widths": [cfg_.data.img_w for i, cfg_ in enumerate(cfg_ls)],
+            "bddl_file_name": [
+                os.path.join(
+                    cfg_.bddl_folder,
+                    task_ls[i].problem_folder,
+                    task_ls[i].bddl_file
+                )
+                for i, cfg_ in enumerate(cfg_ls)
+            ],
+            "camera_heights": [cfg_.data.img_h for _, cfg_ in enumerate(cfg_ls)],
+            "camera_widths": [cfg_.data.img_w for _, cfg_ in enumerate(cfg_ls)],
         }
-
-        env_num = 20
-        # yy: set init_states_ls
-        init_states_ls = []
-        for i, cfg_ in enumerate(cfg_ls):
-            task_ = benchmark.get_task(args.task_id_ls[i])
-            if args.is_local_eval == 1:
-                cfg_.init_states_folder = cfg_.init_states_folder.replace("/mnt/arc/yygx/pkgs_baselines/", "/home/yygx/UNC_Research/pkgs_simu/")
-
-            init_states_path = os.path.join(
-                cfg_.init_states_folder, task_.problem_folder, task_.init_states_file
-            )
-            # print(f"init_states_path: {init_states_path}")
-            init_states = torch.load(init_states_path)
-            # print(f"init_states: {init_states}, size: {init_states.shape}")
-            indices = np.arange(env_num) % init_states.shape[0]
-            # print(f"indices: {indices}")
-            # print(f"init_states[indices]: {init_states[indices]}, size: {init_states[indices].shape}")
-            # yy: init_states[indices],shape -> [20, 77]
-            init_states_ls.append(init_states[indices])
-        # print(f"len(init_states_ls): {len(init_states_ls)}")
-        # print([is_.shape for is_ in init_states_ls])
-        # yy: this is for the 1st task
-        init_states_ = init_states_ls[0]
-
+        env_num = cfg['eval']['n_eval']
         env = SubprocVectorEnv(
-            [lambda: SequentialEnv(n_tasks=len(cfg_ls), init_states_ls=init_states_ls, **env_args)
-             for _ in range(env_num)]
+            [
+                lambda: SequentialEnv(n_tasks=len(cfg_ls), init_states_ls=init_states_ls, **env_args)
+                for _ in range(env_num)
+            ]
         )
         env.reset()
         env.seed(cfg.seed)
-
-        dones = [False] * env_num
-        steps = 0
+        [[algorithm.reset() for algorithm in algorithms] for algorithms in algo_ls]
+        init_states_ = init_states_ls[0]
         obs = env.set_init_state(init_states_)
-        # task_emb = benchmark.get_task_emb(args.task_id)
-
-        num_success = 0
+        dones = [False] * env_num
         task_indexes = [0 for _ in range(env_num)]
+        steps = 0
+        num_success = 0
+        level_success_rate = {int(task_idx): 0 for task_idx in range(n_tasks)}
         for _ in range(5):  # simulate the physics without any actions
             env.step(np.zeros((env_num, 7)))
 
+        # yy: formal start of the evaluation
         with torch.no_grad():
-            while steps < cfg.eval.max_steps:
-                with timeit():
-                    steps += 1
+            while steps < (cfg.eval.max_steps * n_tasks):
+                # print("--------------------------------------------------------------------")
+                # print(steps)
+                steps += 1
+                if steps % (cfg.eval.max_steps // 30) == 0:
+                    print(f"[INFO] Steps: {steps}; Task Indexes: {task_indexes}.", flush=True)
+                    print(f"Evaluation takes {t.get_middle_past_time()} seconds", flush=True)
+                    # if steps == 90:
+                    #     exit(0)
 
-                    actions = np.zeros((1, 7))
-                    for k in range(env_num):
-                        task_emb = benchmark.get_task_emb(args.task_id_ls[task_indexes[k]])
-                        cfg = cfg_ls[task_indexes[k]]
-                        algo = algo_ls[task_indexes[k]]
-                        data = raw_obs_to_tensor_obs(obs, task_emb, cfg)
-                        """
-                            agentview_rgb <class 'torch.Tensor'> torch.Size([20, 3, 128, 128])
-                            eye_in_hand_rgb <class 'torch.Tensor'> torch.Size([20, 3, 128, 128])
-                            gripper_states <class 'torch.Tensor'> torch.Size([20, 2])
-                            joint_states <class 'torch.Tensor'> torch.Size([20, 7])
-                        """
-                        for key, v in data['obs'].items():
-                            data['obs'][key] = v[k, ...][None, ...]
-                        data['task_emb'] = data['task_emb'][k, ...][None, ...]
-                        # yy: 20 * 768
-                        # print(data['task_emb'].size())
-                        actions = np.vstack([actions, algo.policy.get_action(data)])
-                    actions = actions[1:, ...]
-                    obs, reward, done, info = env.step(actions)
-                    task_indexes = [kv['task_index'] for kv in info]
-                    print(f"Step: {steps}")
-                    print(task_indexes)
+                actions = np.zeros((1, 7))
+                # For the 20 envs, each may have different language descriptions, i.e., task_emb
+                task_embs = []
+                for k in range(env_num):
+                    task_emb = benchmark.get_task_emb(task_idx_ls[task_indexes[k]])
+                    task_embs.append(task_emb)
+                task_embs = torch.stack(task_embs)
 
-                    # yy: obs shape: (20,). In it, each element is an OrderedDict
-                    obs_ls = []
-                    for k in range(env_num):
-                        if info[k]['is_init']:
-                            # yy: next task's initial state is extracted,
-                            #  and then passed to be modifed as I only wanna change robot related state
-                            init_state_ = initialize_robot_state(env.get_sim_state()[k], init_states_ls[task_indexes[k]][k, :])[None, ...]
-                            obs_ = env.set_init_state(init_state_, k)
-                            obs_ls.append(obs_[0])
-                        else:
-                            obs_ = obs[k]
-                            obs_ls.append(obs_)
-                    obs = np.stack(obs_ls)
+                # Obtain torch data - main inputs: obs + task_embs
+                data = raw_obs_to_tensor_obs(obs, task_embs, cfg, is_sequential_env=True)
 
-                    video_writer.append_vector_obs(
-                        obs, dones, camera_name="agentview_image"
-                    )
+                for k in range(env_num):
+                    # print(f"env_idx: {k}; task_idx: {task_indexes[k]}")
+                    data_cp = copy.deepcopy(data)
+                    algo = algo_ls[task_indexes[k]][k]
+                    # only take the k'th value for data
+                    for key, v in data_cp['obs'].items():
+                        data_cp['obs'][key] = v[k, ...][None, ...]
+                    data_cp['task_emb'] = data_cp['task_emb'][k, ...][None, ...]
+                    actions = np.vstack([actions, algo.policy.get_action(data_cp)])
+                actions = actions[1:, ...]
+                obs, reward, done, info = env.step(actions)
+                task_indexes = [kv['task_index'] for kv in info]
 
-                    # check whether succeed
-                    for k in range(env_num):
-                        dones[k] = dones[k] or done[k]
-                    print(dones)
-                    if all(dones):
-                        break
+                # yy: reset robot arm if move to a new skill. Modify the obs as well.
+                if np.array([info[is_init_idx]['is_init'] for is_init_idx in range(env_num)]).any():
+                    obs = reset_env_init_states(env, obs, info, init_states_ls, env_num, task_indexes)
+
+                video_writer_agentview.append_vector_obs(
+                    obs, dones, camera_name="agentview_image"
+                )
+                video_writer_wristcameraview.append_vector_obs(
+                    obs, dones, camera_name="robot0_eye_in_hand_image"
+                )
+
+                # check whether succeed
+                for k in range(env_num):
+                    dones[k] = dones[k] or done[k]
+                if all(dones):
+                    break
 
             for k in range(env_num):
                 num_success += int(dones[k])
 
+            """
+            level_info
+            """
+            level_info = np.array([kv['complete_id'] for kv in info])
+            for level, succ_ls in level_success_rate.items():
+                level_success_rate[level] = np.sum(level_info >= level) / env_num
+
+        video_writer_agentview.save(save_video_name="video_agentview")
+        video_writer_wristcameraview.save(save_video_name="video_wristcameraview")
         success_rate = num_success / env_num
         env.close()
 
         eval_stats = {
-            "loss": test_loss,
             "success_rate": success_rate,
+            "level_success_rate": level_success_rate
         }
 
-        os.system(f"mkdir -p {args.save_dir}")
-        torch.save(eval_stats, save_folder)
+        torch.save(eval_stats, save_stats_pth)
+
+    with open(os.path.join(save_dir, f"succ_rate_evaluation_on_ori_envs.npy"), 'wb') as f:
+        np.save(f, success_rate)
+    with open(os.path.join(save_dir, f"level_succ.pkl"), 'wb') as f:
+        pickle.dump(level_success_rate, f)
+
     print(
-        f"[info] finish for ckpt at {run_folder} in {t.get_elapsed_time()} sec for rollouts"
+        f"[info] finish for ckpt at {model_path} in {t.get_elapsed_time()} sec for rollouts"
     )
-    print(f"Results are saved at {save_folder}")
-    print(test_loss, success_rate)
+    print(f"Results are saved at {save_stats_pth}")
+    print(success_rate)
+    eval_task_id.append(task_id)
+
+    print(f"[INFO] Finish evaluating original env list: {eval_task_id}")
 
 
 if __name__ == "__main__":
