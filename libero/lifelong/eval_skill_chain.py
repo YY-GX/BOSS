@@ -2,17 +2,11 @@ import argparse
 import sys
 import os
 
-# TODO:
-#  1. pretrained model
-#  2. initial states set
-#  3. change to for loop to iterate tasks
-
-
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 import numpy as np
 import torch
 from libero.libero import get_libero_path
-from libero.libero.benchmark import get_benchmark, task_orders
+from libero.libero.benchmark import get_benchmark
 from libero.libero.envs import OffScreenRenderEnv, SubprocVectorEnv, SequentialEnv
 from libero.libero.utils.time_utils import Timer
 from libero.libero.utils.video_utils import VideoWriter
