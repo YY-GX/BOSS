@@ -45,3 +45,16 @@ python libero/lifelong/eval_skills_affected_by_oss.py \
 --model_path_folder "./experiments/boss_44/0.0.0/BCTransformerPolicy_seed10000/run_001/" \
 --seed 10000
 ```
+
+
+## Challenge 2
+
+
+
+## Challenge 3
+```shell
+python libero/lifelong/eval_skill_chain.py \
+--seed 10000 --device_id 0 \
+--model_path_folder "/mnt/arc/yygx/pkgs_baselines/LIBERO/libero/experiments/libero_90/skill_policies_without_wrist_camera_view/Sequential/BCRNNPolicy_seed10000/all"
+```
+
