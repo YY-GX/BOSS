@@ -2,12 +2,6 @@ import argparse
 import sys
 import os
 
-# TODO:
-#  1. pretrained model
-#  2. initial states set
-#  3. change to for loop to iterate tasks
-
-
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 import numpy as np
 import torch
@@ -233,8 +227,6 @@ def main():
                 if steps % (cfg.eval.max_steps // 30) == 0:
                     print(f"[INFO] Steps: {steps}; Task Indexes: {task_indexes}.", flush=True)
                     print(f"Evaluation takes {t.get_middle_past_time()} seconds", flush=True)
-                    # if steps == 90:
-                    #     exit(0)
 
                 actions = np.zeros((1, 7))
                 # For the 20 envs, each may have different language descriptions, i.e., task_emb

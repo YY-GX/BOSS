@@ -19,19 +19,30 @@ pip install --force-reinstall
 TODO: move `datasets` folder and `assets` folder.
 
 # BOSS Benchmark
+The BOSS benchmark contains 2 parts of codebases:
+- Skills Training: Train single skills by using the 4 baseline algorithms: BC-RENET-RNN, BC-RESNET-T, BC-VIT-T, OpenVLA.
+- Challenges: 3 challenges, including BOSS-CH1, BOSS-CH2, BOSS-CH3
 
-## Train skills
+## Skills Training
 For BC-*, execute the following commands.
 ```shell
+# For BC-RESNET-RNN
+python libero/lifelong/train_skills.py policy="bc_rnn_policy"
 # For BC-RESNET-T
 python libero/lifelong/train_skills.py policy="bc_transformer_policy"
+# For BC-VIT-T
+python libero/lifelong/train_skills.py policy="bc_vilt_policy"
 ```
 For OpenVLA, execute the following commands.
 ```shell
-
+cd openvla/shells
+zsh shells/run_openvla.sh
 ```
 
-## Challenge 1
+## Challenges
+
+### BOSS-CH1: Single Predicate Modification
+For BC-*, execute the following commands.
 ```shell
 # Test BC-RESNET-T when unaffected by OSS
 python libero/lifelong/eval_skills_unaffected_by_oss.py \
@@ -45,13 +56,22 @@ python libero/lifelong/eval_skills_affected_by_oss.py \
 --model_path_folder "./experiments/boss_44/0.0.0/BCTransformerPolicy_seed10000/run_001/" \
 --seed 10000
 ```
+Checkpoints will be saved at `./experiments/boss_44/0.0.0/BC{algo}Policy_seed10000/run_00*/`.
+
+For OpenVLA, execute the following commands.
+```shell
+python experiments/robot/libero/run_libero44_eval_args.py  --seed 10000 --task_suite_name "boss_44"
+```
 
 
-## Challenge 2
+
+### BOSS-CH2: Accumulated Predicates Modification
+```shell
+
+```
 
 
-
-## Challenge 3
+### BOSS-CH3: Real Long-Horizon Task
 ```shell
 python libero/lifelong/eval_skill_chain.py \
 --seed 10000 --device_id 0 \
