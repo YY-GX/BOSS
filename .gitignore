@@ -25,3 +25,5 @@ server_results/*
 ./sam/**
 libero/datasets/*
 libero/libero/assets/*
+openvla/runs/*
+openvla/datasets/*
