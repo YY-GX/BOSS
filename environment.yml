@@ -159,5 +159,4 @@ dependencies:
       - werkzeug==3.0.4
       - yapf==0.40.2
       - zipp==3.20.2
-prefix: /mnt/arc/yygx/.conda/envs/libero
 
