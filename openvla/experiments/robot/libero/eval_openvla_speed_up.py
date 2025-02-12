@@ -12,9 +12,6 @@ Usage:
         --task_suite_name [ libero_spatial | libero_object | libero_goal | libero_10 | libero_90 ] \
         --center_crop [ True | False ] \
         --run_id_note <OPTIONAL TAG TO INSERT INTO RUN ID FOR LOGGING> \
-        --use_wandb [ True | False ] \
-        --wandb_project <PROJECT> \
-        --wandb_entity <ENTITY>
 """
 
 import os
@@ -27,7 +24,6 @@ from typing import Optional, Union
 import draccus
 import numpy as np
 import tqdm
-import wandb
 
 # Append current directory so that interpreter can find experiments.robot
 sys.path.append("./openvla/")
@@ -93,9 +89,6 @@ def parse_args():
     #################################################################################################################
     parser.add_argument("--run_id_note", type=str, default=None, help="Extra note to add in run ID for logging")
     parser.add_argument("--local_log_dir", type=str, default="./experiments/logs/", help="Directory for eval logs")
-    parser.add_argument("--use_wandb", action="store_true", default=False, help="Log results in Weights & Biases")
-    parser.add_argument("--wandb_project", type=str, default="YOUR_WANDB_PROJECT", help="W&B project name")
-    parser.add_argument("--wandb_entity", type=str, default="YOUR_WANDB_ENTITY", help="W&B entity name")
     parser.add_argument("--seed", type=int, default=10000, help="Random seed for reproducibility")
 
     return parser.parse_args()
@@ -143,14 +136,6 @@ def eval_libero(cfg):
     local_log_filepath = os.path.join(cfg.local_log_dir, run_id, run_id + ".txt")
     log_file = open(local_log_filepath, "w")
     print(f"Logging to local log file: {local_log_filepath}")
-
-    # Initialize Weights & Biases logging as well
-    if cfg.use_wandb:
-        wandb.init(
-            entity=cfg.wandb_entity,
-            project=cfg.wandb_project,
-            name=run_id,
-        )
 
     # Initialize LIBERO task suite
     benchmark_dict = benchmark.get_benchmark_dict()
@@ -287,31 +272,12 @@ def eval_libero(cfg):
         log_file.write(f"# successes: {total_successes} ({total_successes / total_episodes * 100:.1f}%)\n")
         log_file.flush()
 
-        if cfg.use_wandb:
-            wandb.log(
-                {
-                    f"success_rate/{task_description}": float(task_successes) / float(cfg.num_trials_per_task),
-                }
-            )
-
     # Save local log file
     log_file.close()
 
     # Save rollouts / succ list
     np.save(os.path.join(local_log_save_dir, f"tasks_success_list_{cfg.task_suite_name}_seed_{cfg.seed}.npy"),
             np.array(tasks_success_list))
-
-    # Push total metrics and local log file to wandb
-    if cfg.use_wandb:
-        wandb.log(
-            {
-                "success_rate/total": float(total_successes) / float(total_episodes),
-                "num_episodes/total": total_episodes,
-            }
-        )
-        wandb.save(local_log_filepath)
-
-
 
 
 if __name__ == "__main__":
