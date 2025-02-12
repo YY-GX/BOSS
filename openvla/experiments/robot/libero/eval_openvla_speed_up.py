@@ -194,7 +194,7 @@ def eval_libero(cfg):
         # yy: need to use list of inits
         indices = np.arange(cfg.num_trials_per_task) % initial_states.shape[0]
         initial_states = initial_states[indices]
-        env.set_init_state(initial_states)
+        obs = env.set_init_state(initial_states)
 
 
         # Setup
@@ -208,51 +208,51 @@ def eval_libero(cfg):
             max_steps = 400  # longest training demo has 373 steps
 
         while t < max_steps + cfg.num_steps_wait:
-            try:
-                # IMPORTANT: Do nothing for the first few timesteps because the simulator drops objects
-                # and we need to wait for them to fall
-                if t < cfg.num_steps_wait:
-                    # obs, reward, done, info = env.step(get_libero_dummy_action(cfg.model_family))
-                    # yy: action shall be of shape [env_num, ...]
-                    env.step(get_libero_dummy_action_parallel(cfg.num_trials_per_task))
-                    t += 1
-                    continue
-
-                # yy: assemble all actions -> batched actions
-                actions = get_batch_action_given_batch_obs(observations, cfg, resize_size, model, task_description,
-                                                           processor, get_action)
-
-                actions_traj.append(np.array(actions))  # [20, 7]
-                proprios_traj.append(np.array([np.concatenate(
-                    (obs_["robot0_eef_pos"], quat2axisangle(obs_["robot0_eef_quat"]), obs_["robot0_gripper_qpos"])
-                ) for obs_ in observations]))  # [20, 9 (?)]
-
-                # Execute action in environment
-                obs, reward, done, info = env.step(actions)
-
-                # yy: my video recorder save obses
-                video_writer_agentview.append_vector_obs(
-                    obs, dones, camera_name="agentview_image"
-                )
-                video_writer_wristcameraview.append_vector_obs(
-                    obs, dones, camera_name="robot0_eye_in_hand_image"
-                )
-
-                # check whether succeed
-                # yy: dones is also of shape [env_num, ...], need some modifications
-                for k in range(cfg.num_trials_per_task):
-                    dones[k] = dones[k] or done[k]
-                if all(dones):
-                    task_successes += np.sum(dones)
-                    total_successes += np.sum(dones)
-                    break
-
+            # try:
+            # IMPORTANT: Do nothing for the first few timesteps because the simulator drops objects
+            # and we need to wait for them to fall
+            if t < cfg.num_steps_wait:
+                # obs, reward, done, info = env.step(get_libero_dummy_action(cfg.model_family))
+                # yy: action shall be of shape [env_num, ...]
+                obs, reward, done, info = env.step(get_libero_dummy_action_parallel(cfg.num_trials_per_task))
                 t += 1
+                continue
 
-            except Exception as e:
-                print(f"Caught exception: {e}")
-                log_file.write(f"Caught exception: {e}\n")
+            # yy: assemble all actions -> batched actions
+            actions = get_batch_action_given_batch_obs(obs, cfg, resize_size, model, task_description,
+                                                       processor, get_action)
+
+            actions_traj.append(np.array(actions))  # [20, 7]
+            proprios_traj.append(np.array([np.concatenate(
+                (obs_["robot0_eef_pos"], quat2axisangle(obs_["robot0_eef_quat"]), obs_["robot0_gripper_qpos"])
+            ) for obs_ in obs]))  # [20, 9 (?)]
+
+            # Execute action in environment
+            obs, reward, done, info = env.step(actions)
+
+            # yy: my video recorder save obses
+            video_writer_agentview.append_vector_obs(
+                obs, dones, camera_name="agentview_image"
+            )
+            video_writer_wristcameraview.append_vector_obs(
+                obs, dones, camera_name="robot0_eye_in_hand_image"
+            )
+
+            # check whether succeed
+            # yy: dones is also of shape [env_num, ...], need some modifications
+            for k in range(cfg.num_trials_per_task):
+                dones[k] = dones[k] or done[k]
+            if all(dones):
+                task_successes += np.sum(dones)
+                total_successes += np.sum(dones)
                 break
+
+            t += 1
+
+            # except Exception as e:
+            #     print(f"Caught exception: {e}")
+            #     log_file.write(f"Caught exception: {e}\n")
+            #     break
 
         video_writer_agentview.save(save_video_name="video_agentview")
         video_writer_wristcameraview.save(save_video_name="video_wristcameraview")
