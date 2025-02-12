@@ -15,13 +15,13 @@ Usage:
 """
 
 import os
-current_working_directory = os.getcwd()
-print(os.getcwd())
-os.chdir("../../../../")
-print(os.getcwd())
+# current_working_directory = os.getcwd()
+# print(os.getcwd())
+# os.chdir("../../../../")
+# print(os.getcwd())
 from libero.libero import benchmark
 from libero.libero.utils.video_utils import VideoWriter
-os.chdir(current_working_directory)
+# os.chdir(current_working_directory)
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -31,8 +31,9 @@ import numpy as np
 import tqdm
 
 # Append current directory so that interpreter can find experiments.robot
-sys.path.append("../../")
-sys.path.append("../../../")
+# sys.path.append("../../")
+# sys.path.append("../../../")
+sys.path.append("openvla/")
 from experiments.robot.libero.libero_utils import (
     get_libero_dummy_action,
     get_libero_dummy_action_parallel,
