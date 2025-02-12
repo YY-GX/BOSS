@@ -59,7 +59,7 @@ import argparse
 from pathlib import Path
 from typing import Optional, Union
 
-
+import time
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Evaluation script for LIBERO tasks")
@@ -158,6 +158,8 @@ def eval_libero(cfg):
     total_episodes, total_successes = 0, 0
     tasks_success_list = []
     for task_id in tqdm.tqdm(range(num_tasks_in_suite)):
+        start_time = time.time()
+
         # Get task
         task = task_suite.get_task(task_id)
 
@@ -220,7 +222,7 @@ def eval_libero(cfg):
 
             # yy: assemble all actions -> batched actions
             actions = get_batch_action_given_batch_obs(obs, cfg, resize_size, model, task_description,
-                                                       processor, get_action)
+                                                       processor, get_action, normalize_gripper_action)
 
             actions_traj.append(np.array(actions))  # [20, 7]
             proprios_traj.append(np.array([np.concatenate(
@@ -270,14 +272,20 @@ def eval_libero(cfg):
         np.save(os.path.join(local_log_save_dir, f"tasks_success_list_{cfg.task_suite_name}_seed_{cfg.seed}.npy"),
                 np.array(tasks_success_list))
 
+        end_time = time.time()
+        elapsed_time = end_time - start_time
         # Log current results
         print(f"Current task success rate: {float(task_successes) / float(cfg.num_trials_per_task)}")
         print(f"# episodes completed so far: {total_episodes}")
         print(f"# successes: {total_successes} ({total_successes / total_episodes * 100:.1f}%)")
+        print(f"Execution time: {elapsed_time:.6f} seconds")
         log_file.write(f"Current task success rate: {float(task_successes) / float(cfg.num_trials_per_task)}\n")
         log_file.write(f"# episodes completed so far: {total_episodes}\n")
         log_file.write(f"# successes: {total_successes} ({total_successes / total_episodes * 100:.1f}%)\n")
+        log_file.write(f"Execution time: {elapsed_time:.6f} seconds\n")
         log_file.flush()
+
+
 
     # Save local log file
     log_file.close()

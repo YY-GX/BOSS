@@ -65,8 +65,8 @@ def get_libero_dummy_action_parallel(num_trials_per_task=20):
     dummy_actions[:, -1] = -1
     return dummy_actions
 
-
-def get_batch_action_given_batch_obs(observations, cfg, resize_size, model, task_description, processor, get_action):
+def get_batch_action_given_batch_obs(observations, cfg, resize_size, model, task_description, processor, get_action,
+                                     normalize_gripper_action):
     """
     TODO: Could speed up more by either
         (1) if openvla could directly take batched obs as input, then don't use loop
