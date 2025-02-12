@@ -27,3 +27,5 @@ libero/datasets/*
 libero/libero/assets/*
 openvla/runs/*
 openvla/datasets/*
+# Allow tracking experiments under openvla
+!openvla/experiments/
