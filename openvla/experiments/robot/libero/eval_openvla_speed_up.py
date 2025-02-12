@@ -222,7 +222,7 @@ def eval_libero(cfg):
 
             # yy: assemble all actions -> batched actions
             actions = get_batch_action_given_batch_obs(obs, cfg, resize_size, model, task_description,
-                                                       processor, get_action, normalize_gripper_action)
+                                                       processor, get_action, normalize_gripper_action, invert_gripper_action)
 
             actions_traj.append(np.array(actions))  # [20, 7]
             proprios_traj.append(np.array([np.concatenate(
