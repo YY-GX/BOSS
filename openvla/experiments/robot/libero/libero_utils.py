@@ -14,6 +14,8 @@ from experiments.robot.robot_utils import (
     DATE_TIME,
 )
 
+import time
+
 
 def get_libero_env(task, model_family, resolution=256):
     """Initializes and returns the LIBERO environment, along with the task description."""
@@ -76,6 +78,7 @@ def get_batch_action_given_batch_obs(observations, cfg, resize_size, model, task
     Outputs:
         - actions: shape of [num_trials_per_task, act_shape...]
     """
+    start_time = time.time()
     actions = []
     for obs in observations:
         img = get_libero_image(obs, resize_size)  # shape: (224, 224, 3)
@@ -107,6 +110,9 @@ def get_batch_action_given_batch_obs(observations, cfg, resize_size, model, task
             action = invert_gripper_action(action)
 
         actions.append(action.tolist())
+
+    elapsed_time = time.time() - start_time
+    print(f">> Elapsed time is {elapsed_time} for 1 timestep movement for 20 envs.")
 
     return actions
 
