@@ -71,7 +71,7 @@ def parse_args():
     parser.add_argument(
         "--pretrained_checkpoint",
         type=str,
-        default="runs/libero44/1.0.0/openvla-7b+libero44+b8+lr-0.0005+lora-r32+dropout-0.0--image_aug",
+        default="/mnt/arc/yygx/pkgs_baselines/openvla/runs/libero44/1.0.0/openvla-7b+libero44+b8+lr-0.0005+lora-r32+dropout-0.0--image_aug",
         # "runs/bl3_all/1.0.0/openvla-7b+libero_bl3_all+b8+lr-0.0005+lora-r32+dropout-0.0--image_aug",  # data_aug
         help="Pretrained checkpoint path",
     )

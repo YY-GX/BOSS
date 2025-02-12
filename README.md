@@ -11,6 +11,8 @@ For openvla installation, please check
 ```shell
 
 pip install --upgrade transformers
+pip install --upgrade tensorflow_graphics
+pip install --upgrade tensorflow_datasets
 ```
 
 
