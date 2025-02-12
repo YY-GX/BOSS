@@ -30,7 +30,7 @@ import tqdm
 import wandb
 
 # Append current directory so that interpreter can find experiments.robot
-sys.path.append("../..")
+sys.path.append("./openvla/")
 from experiments.robot.libero.libero_utils import (
     get_libero_dummy_action,
     get_libero_dummy_action_parallel,
