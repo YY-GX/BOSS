@@ -7,6 +7,13 @@ conda env create -f environment.yaml
 
 TODO: move `datasets` folder and `assets` folder.
 
+For openvla installation, please check 
+```shell
+
+pip install --upgrade transformers
+```
+
+
 # BOSS Benchmark
 The BOSS benchmark contains 2 parts of codebases:
 - Skills Training: Train single skills by using the 4 baseline algorithms: BC-RENET-RNN, BC-RESNET-T, BC-VIT-T, OpenVLA.
