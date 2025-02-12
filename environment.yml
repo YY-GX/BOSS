@@ -161,4 +161,5 @@ dependencies:
       - zipp==3.20.2
       - draccus
       - tensorflow
+      - accelerate
 

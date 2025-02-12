@@ -33,8 +33,8 @@ import tqdm
 # Append current directory so that interpreter can find experiments.robot
 # sys.path.append("../../")
 # sys.path.append("../../../")
-sys.path.append("openvla/")
-from experiments.robot.libero.libero_utils import (
+# sys.path.append("openvla/")
+from openvla.experiments.robot.libero.libero_utils import (
     get_libero_dummy_action,
     get_libero_dummy_action_parallel,
     get_libero_env,
@@ -44,8 +44,8 @@ from experiments.robot.libero.libero_utils import (
     get_libero_subproc_env,
     get_batch_action_given_batch_obs,
 )
-from experiments.robot.openvla_utils import get_processor
-from experiments.robot.robot_utils import (
+from openvla.experiments.robot.openvla_utils import get_processor
+from openvla.experiments.robot.robot_utils import (
     DATE_TIME,
     get_action,
     get_image_resize_size,
