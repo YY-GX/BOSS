@@ -17,7 +17,7 @@ Usage:
 import os
 current_working_directory = os.getcwd()
 print(os.getcwd())
-os.chdir("../../../")
+os.chdir("../../../../")
 print(os.getcwd())
 from libero.libero import benchmark
 from libero.libero.utils.video_utils import VideoWriter
@@ -32,6 +32,7 @@ import tqdm
 
 # Append current directory so that interpreter can find experiments.robot
 sys.path.append("../../")
+sys.path.append("../../../")
 from experiments.robot.libero.libero_utils import (
     get_libero_dummy_action,
     get_libero_dummy_action_parallel,
