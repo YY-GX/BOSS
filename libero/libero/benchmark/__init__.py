@@ -280,8 +280,8 @@ def register_benchmark_classes(prefix, start, end):
 # Generate and register CH3_1 to CH3_10
 register_benchmark_classes("CH3_", 1, 10)
 
-# Generate and register G1 to G4
-register_benchmark_classes("G", 1, 4)
+# Generate and register G1 to G6
+register_benchmark_classes("G", 1, 6)
 
 
 
@@ -349,6 +349,8 @@ eval_ori_suites = [
     "g2",
     "g3",
     "g4",
+    "g5",
+    "g6"
 ]
 
 for ori_suite in eval_ori_suites:
@@ -383,6 +385,8 @@ selected_task_indexes = {
     "g2": [7, 19, 88, 29, 67, 86, 61, 63, 56, 25, 26, 64, 18, 83, 4, 60, 71, 15, 45, 66],
     "g3": [39, 22, 61, 84, 49, 89, 51, 47, 6, 85, 0, 82, 50, 26, 57, 23, 17, 74, 83, 55],
     "g4": [39, 49, 20, 61, 31, 89, 13, 6, 67, 1, 41, 57, 30, 80, 77, 5, 23, 54, 55, 38],
+    "g5": [22, 13, 42, 7, 39, 40, 45, 64, 0, 72],
+    "g6": [22, 13, 45, 64, 0],
 }
 
 
