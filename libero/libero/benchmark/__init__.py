@@ -280,8 +280,8 @@ def register_benchmark_classes(prefix, start, end):
 # Generate and register CH3_1 to CH3_10
 register_benchmark_classes("CH3_", 1, 10)
 
-# Generate and register G1 to G6
-register_benchmark_classes("G", 1, 6)
+# Generate and register G1 to G8
+register_benchmark_classes("G", 1, 8)
 
 
 
