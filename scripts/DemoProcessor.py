@@ -124,7 +124,7 @@ def main():
     is_succ = False
     succ_dict = {"success_idx": [], "failure_idx": []}
     for (i, ep) in enumerate(demos):
-        # yy: the sequence of new generated h5 is different from the original one
+        # the sequence of new generated h5 is different from the original one
         print(f"Playing back random episode {i}... (press ESC to quit)")
 
         # # select an episode randomly
@@ -150,10 +150,10 @@ def main():
         num_actions = actions.shape[0]
 
         init_idx = 0
-        # yy: I commented this
+        # I commented this
         # env.reset_from_xml_string(model_xml)
         env.sim.reset()
-        # yy: SUPER IMPORTANT: I changed /home/yygx/anaconda3/envs/libero/lib/python3.8/site-packages/robosuite/utils/binding_utils.py file's 1167 line.
+        # SUPER IMPORTANT: I changed /home/yygx/anaconda3/envs/libero/lib/python3.8/site-packages/robosuite/utils/binding_utils.py file's 1167 line.
         env.sim.set_state_from_flattened(states[init_idx])
         env.sim.forward()
         env.reset()
@@ -169,7 +169,7 @@ def main():
         eye_in_hand_depths = []
         valid_index = []
 
-        # yy: This is where to do demo replay
+        # This is where to do demo replay
         for j, action in enumerate(actions):
             obs, reward, done, info = env.step(action)
             if j < num_actions - 1:
@@ -211,7 +211,7 @@ def main():
                 eye_in_hand_images.append(obs["robot0_eye_in_hand_image"])
             else:
                 env.render()
-            # yy: only save once succeed
+            # only save once succeed
             if done:
                 if not is_succ:
                     succ_idx += 1
@@ -230,7 +230,7 @@ def main():
         rewards[-1] = 1
         assert len(actions) == len(agentview_images)
 
-        # yy: This is where a new demo is created into the hdf5 file
+        # This is where a new demo is created into the hdf5 file
         ep_data_grp = grp.create_group(f"demo_{i}")
 
         obs_grp = ep_data_grp.create_group("obs")

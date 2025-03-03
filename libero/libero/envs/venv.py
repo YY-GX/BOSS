@@ -14,7 +14,7 @@ from typing import Any, Callable, List, Optional, Tuple, Union
 
 import multiprocessing
 
-# # yy: I comment this
+# # I comment this
 # if multiprocessing.get_start_method(allow_none=True) != "spawn":
 #     multiprocessing.set_start_method("spawn", force=True)
 
@@ -937,7 +937,7 @@ class SubprocVectorEnv(BaseVectorEnv):
     def __init__(self, env_fns: List[Callable[[], gym.Env]], **kwargs: Any) -> None:
         self.num_envs = len(env_fns)
 
-        # yy: I comment this
+        # I comment this
         if multiprocessing.get_start_method(allow_none=True) != "spawn":
             multiprocessing.set_start_method("spawn", force=True)
 

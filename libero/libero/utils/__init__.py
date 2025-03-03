@@ -5,7 +5,7 @@ import yaml
 libero_config_path = os.environ.get(
     "LIBERO_CONFIG_PATH", os.path.expanduser("~/.libero")
 )
-# yy: change config file name
+# change config file name
 config_file = os.path.join(libero_config_path, "config.yaml")
 
 

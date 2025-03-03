@@ -130,7 +130,7 @@ def main(hydra_cfg):
     print("=======================================================================\n")
 
 
-    # yy: my analyses
+    # my analyses
     # print(type(datasets[0]))
     # print(len(datasets[0]))  # 3828
     # print(datasets[0].n_demos)  # 50

@@ -69,7 +69,7 @@ if not os.path.exists(config_file):
     # answer = input(
     #     "Do you want to specify a custom path for the dataset folder? (Y/N): "
     # ).lower()
-    # yy: all no for this answer
+    # all no for this answer
     answer = "n"
     if answer == "y":
         # If the user wants to specify a custom storage path, prompt them to enter it

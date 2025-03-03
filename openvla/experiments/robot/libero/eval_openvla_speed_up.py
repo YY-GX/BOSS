@@ -117,7 +117,7 @@ def eval_libero(cfg):
     # Load model
     model = get_model(cfg)
 
-    # yy: TODO: I don't get what this part is about
+    # TODO: I don't get what this part is about
     # [OpenVLA] Check that the model contains the action un-normalization key
     if cfg.model_family == "openvla":
         # In some cases, the key must be manually modified (e.g. after training on a modified version of the dataset
@@ -168,14 +168,14 @@ def eval_libero(cfg):
 
         # Initialize LIBERO environment and task description
         # env, task_description = get_libero_env(task, cfg.model_family, resolution=256)
-        # yy: parallel env
+        # parallel env
         env, task_description = get_libero_subproc_env(task, num_trials_per_task=cfg.num_trials_per_task,
                                                        resolution=256)
 
-        # yy: add traj for debugging
+        # add traj for debugging
         actions_traj, proprios_traj = [], []
 
-        # yy: add my video recorder
+        # add my video recorder
         video_folder_pth = os.path.join(local_log_save_dir, f"{task_id}_videos_{task_description}")
         os.makedirs(video_folder_pth, exist_ok=True)
         video_writer_agentview = VideoWriter(os.path.join(video_folder_pth, "agentview"), save_video=True,
@@ -193,7 +193,7 @@ def eval_libero(cfg):
 
         # Set initial states
         # obs = env.set_init_state(initial_states[episode_idx % initial_states.shape[0]])
-        # yy: need to use list of inits
+        # need to use list of inits
         indices = np.arange(cfg.num_trials_per_task) % initial_states.shape[0]
         initial_states = initial_states[indices]
         obs = env.set_init_state(initial_states)
@@ -201,7 +201,7 @@ def eval_libero(cfg):
 
         # Setup
         t = 0
-        dones = [False] * cfg.num_trials_per_task  # yy: add dones list
+        dones = [False] * cfg.num_trials_per_task  # add dones list
         if cfg.task_suite_name == "boss_44":
             max_steps = 400  # longest training demo has 373 steps
         elif ((cfg.task_suite_name == "ch1") or
@@ -215,12 +215,12 @@ def eval_libero(cfg):
             # and we need to wait for them to fall
             if t < cfg.num_steps_wait:
                 # obs, reward, done, info = env.step(get_libero_dummy_action(cfg.model_family))
-                # yy: action shall be of shape [env_num, ...]
+                # action shall be of shape [env_num, ...]
                 obs, reward, done, info = env.step(get_libero_dummy_action_parallel(cfg.num_trials_per_task))
                 t += 1
                 continue
 
-            # yy: assemble all actions -> batched actions
+            # assemble all actions -> batched actions
             actions = get_batch_action_given_batch_obs(obs, cfg, resize_size, model, task_description,
                                                        processor, get_action, normalize_gripper_action, invert_gripper_action)
 
@@ -232,7 +232,7 @@ def eval_libero(cfg):
             # Execute action in environment
             obs, reward, done, info = env.step(actions)
 
-            # yy: my video recorder save obses
+            # my video recorder save obses
             video_writer_agentview.append_vector_obs(
                 obs, dones, camera_name="agentview_image"
             )
@@ -241,7 +241,7 @@ def eval_libero(cfg):
             )
 
             # check whether succeed
-            # yy: dones is also of shape [env_num, ...], need some modifications
+            # dones is also of shape [env_num, ...], need some modifications
             for k in range(cfg.num_trials_per_task):
                 dones[k] = dones[k] or done[k]
             if all(dones):

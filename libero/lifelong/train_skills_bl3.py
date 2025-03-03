@@ -109,7 +109,7 @@ def main(hydra_cfg):
             exit(1)
         # add language to the vision dataset, hence we call vl_dataset
         task_description = benchmark.get_task(i).language
-        # yy: they maintain a list containing (lang, ds)
+        # they maintain a list containing (lang, ds)
         descriptions.append(task_description)
         manip_datasets.append(task_i_dataset)
 

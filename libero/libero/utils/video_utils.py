@@ -37,7 +37,7 @@ class VideoWriter:
             else:
                 if self.last_images[idx] is None:
                     self.last_images[idx] = obs[camera_name][::-1]
-                #     yy: I add this line: if self.single_video:
+                #     I add this line: if self.single_video:
                 if self.single_video:
                     original_image = np.copy(self.last_images[idx])
                     blank_image = np.ones_like(original_image) * 128
@@ -49,7 +49,7 @@ class VideoWriter:
                     )
                     self.image_buffer[idx].append(original_image.astype(np.uint8))
                 else:
-                    # yy: do nothing - do NOT add anything at the end of each video
+                    # do nothing - do NOT add anything at the end of each video
                     pass
 
     def reset(self):

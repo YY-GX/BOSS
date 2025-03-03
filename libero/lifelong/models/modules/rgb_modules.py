@@ -15,7 +15,7 @@ import torchvision
 #
 ###############################################################################
 
-# yy: directly modify this one
+# directly modify this one
 class PatchEncoder(nn.Module):
     """
     A patch encoder that does a linear projection of patches in a RGB image.

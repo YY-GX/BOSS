@@ -125,7 +125,7 @@ class ControlEnv:
         self.env._update_observables(force=force)
 
     def set_state(self, mujoco_state):
-        # yy: mujoco_state shape -> (1, 77)
+        # mujoco_state shape -> (1, 77)
         self.env.sim.set_state_from_flattened(mujoco_state)
 
     def reset_from_xml_string(self, xml_string):
@@ -168,7 +168,7 @@ class OffScreenRenderEnv(ControlEnv):
         super().__init__(**kwargs)
 
 
-# yy: remember to check this later
+# remember to check this later
 class SegmentationRenderEnv(OffScreenRenderEnv):
     """
     This wrapper will additionally generate the segmentation mask of objects,
@@ -292,7 +292,7 @@ class SequentialEnv(OffScreenRenderEnv):
     """
 
     def __init__(self, n_tasks, init_states_ls, **kwargs):
-        # yy: note - in this class code, task == env
+        # note - in this class code, task == env
         self.n_tasks = n_tasks
         self.init_states_ls = init_states_ls
 
@@ -336,13 +336,13 @@ class SequentialEnv(OffScreenRenderEnv):
             self.complete_task.append(self.task_id)
             self.complete_id = self.task_id
             self.task_dones[self.task_id] = True
-            # yy: if current task_id is already the last one, do nothing (i.e., done = True)
-            # yy: otherwise, auto initialize state for each new subtask - Note: still need to do this init for the 1st task manually
+            # if current task_id is already the last one, do nothing (i.e., done = True)
+            # otherwise, auto initialize state for each new subtask - Note: still need to do this init for the 1st task manually
             if self.task_id != (self.n_tasks - 1):
                 self.task_id += 1
                 done = False
                 info['is_init'] = True
-                # yy: set new state for the next task env
+                # set new state for the next task env
                 crr_env_state = self.env_ls[self.task_id - 1].get_sim_state()
                 self.env_ls[self.task_id].reset()
                 self.env_ls[self.task_id].set_init_state(crr_env_state)

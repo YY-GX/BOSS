@@ -110,7 +110,7 @@ yy_suites = [
     "multi_step_3",
     "bl3_all"
 ]
-# yy: if you wanna the task description the same as the original one, set True here.
+# if you wanna the task description the same as the original one, set True here.
 keep_language_unchanged = True
 for yy_suite in yy_suites:
     task_maps[yy_suite] = {}
@@ -197,7 +197,7 @@ class Benchmark(abc.ABC):
         else:
             print(f"[info] using task orders {task_orders[self.task_order_index]}")
             self.tasks = [tasks[i] for i in task_orders[self.task_order_index]]
-        # yy: set 1 for just traininig 1 task
+        # set 1 for just traininig 1 task
         if self.n_tasks_:
             self.n_tasks = self.n_tasks_
         else:
@@ -280,7 +280,7 @@ class LIBERO_90(Benchmark):
     # FIXED: remember to change 28 back to 0 later
     def __init__(self, task_order_index=0, n_tasks_=None):
         super().__init__(task_order_index=task_order_index, n_tasks_=n_tasks_)
-        # yy: I comment this
+        # I comment this
         # assert (
         #     task_order_index == 0
         # ), "[error] currently only support task order for 10-task suites"

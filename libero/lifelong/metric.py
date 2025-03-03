@@ -56,7 +56,7 @@ def raw_obs_to_tensor_obs(obs, task_emb, cfg, is_sequential_env=False):
     return data
 
 
-# yy: I add the `@torch.no_grad()`
+# I add the `@torch.no_grad()`
 @torch.no_grad()
 def evaluate_one_task_success(
     cfg, algo, task, task_emb, task_id, sim_states=None, task_str="", video_folder=""
@@ -85,7 +85,7 @@ def evaluate_one_task_success(
         }
 
         env_num = min(cfg.eval.num_procs, cfg.eval.n_eval) if cfg.eval.use_mp else 1
-        # yy: 1
+        # 1
         eval_loop_num = (cfg.eval.n_eval + env_num - 1) // env_num
 
         # Try to handle the frame buffer issue
@@ -183,7 +183,7 @@ def evaluate_one_task_success(
         gc.collect()
     print(f"[info] evaluate task {task_id} takes {t.get_elapsed_time():.1f} seconds")
 
-    # yy: set it back to None
+    # set it back to None
     if multiprocessing.get_start_method(allow_none=True) is not None:
         multiprocessing.set_start_method(None, force=True)
 

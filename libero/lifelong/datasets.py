@@ -193,7 +193,7 @@ def get_combined_dataset(
 
     empty_ds_idx_ls = []
     for i, dataset_path in enumerate(dataset_path_ls):
-        # yy: Jump is ds size is 0
+        # Jump is ds size is 0
         dataset_path = os.path.expanduser(dataset_path)
         f = h5py.File(dataset_path, "r")
         if len(list(f["data"].keys())) == 0:

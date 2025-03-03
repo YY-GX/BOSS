@@ -59,7 +59,7 @@ def parse_args():
 
 
 def initialize_robot_state(crr_state, robot_init_sim_state):
-    # yy: 0: timestep; 1-40: states; 41-76: vel_info;
+    # 0: timestep; 1-40: states; 41-76: vel_info;
     modified_state = crr_state.copy()
     # initial robot states
     modified_state[1:10] = robot_init_sim_state[1:10]
@@ -72,7 +72,7 @@ def reset_env_init_states(env, obs, info, init_states_ls, env_num, task_indexes)
     obs_ls = []
     for k in range(env_num):
         if info[k]['is_init']:
-            # yy: next task's initial state is extracted,
+            # next task's initial state is extracted,
             #  and then passed to be modifed as I only wanna change robot related state
             init_state_ = initialize_robot_state(env.get_sim_state()[k], init_states_ls[task_indexes[k]][k, :])[
                 None, ...]
@@ -106,7 +106,7 @@ def main():
     print(f">> Create folder {save_dir}")
     os.system(f"mkdir -p {save_dir}")
 
-    # yy: For collecting necessary list of items
+    # For collecting necessary list of items
     # For sequential env, need to obtain: cfg_ls, algo_ls, initial_states_ls
     cfg_ls, algo_ls, init_states_ls, task_ls = [], [], [], []
     task_embs = []
@@ -130,7 +130,7 @@ def main():
         cfg.bddl_folder = get_libero_path("bddl_files")
         cfg.init_states_folder = get_libero_path("init_states")
         cfg.device = args.device_id
-        # yy: cfg_ls here
+        # cfg_ls here
         cfg_ls.append(cfg)
 
         # Create algo
@@ -138,14 +138,14 @@ def main():
         algo.policy.load_state_dict(sd)
         algo.eval()
         # print(f">> task_id: {task_id}, policy class: {algo.policy}")
-        # yy: algo_ls here
+        # algo_ls here
         algo_ls.append([copy.deepcopy(algo) for _ in range(cfg['eval']['n_eval'])])
 
         # Obtain language embs & task
         task_embs += get_task_embs(cfg, descriptions)
         benchmark.set_task_embs(task_embs)
         task = benchmark.get_task(task_idx)
-        # yy: task_ls here
+        # task_ls here
         task_ls.append(task)
 
         init_states_path = os.path.join(
@@ -153,7 +153,7 @@ def main():
         )
         init_states = torch.load(init_states_path)
         indices = np.arange(cfg['eval']['n_eval']) % init_states.shape[0]
-        # yy: init_states_ls here
+        # init_states_ls here
         init_states_ls.append(init_states[indices])  # each element with shape [env_num, ...]
 
 
@@ -178,13 +178,13 @@ def main():
     os.system(f"mkdir -p {video_folder}")
 
     with Timer() as t:
-        # yy: video recorder preparation
+        # video recorder preparation
         video_writer_agentview = VideoWriter(os.path.join(video_folder, "agentview"), save_video=True,
                                              single_video=False)
         video_writer_wristcameraview = VideoWriter(os.path.join(video_folder, "wristcameraview"), save_video=True,
                                                    single_video=False)
 
-        # yy: env preparation
+        # env preparation
         env_args = {
             "bddl_file_name": [
                 os.path.join(
@@ -218,7 +218,7 @@ def main():
             env.step(np.zeros((env_num, 7)))
 
         # TODO: Start coding from this line!!!
-        # yy: formal start of the evaluation
+        # formal start of the evaluation
         with torch.no_grad():
             while steps < (cfg.eval.max_steps * n_tasks):
                 # print("--------------------------------------------------------------------")
@@ -253,7 +253,7 @@ def main():
                 obs, reward, done, info = env.step(actions)
                 task_indexes = [kv['task_index'] for kv in info]
 
-                # yy: reset robot arm if move to a new skill. Modify the obs as well.
+                # reset robot arm if move to a new skill. Modify the obs as well.
                 if np.array([info[is_init_idx]['is_init'] for is_init_idx in range(env_num)]).any():
                     obs = reset_env_init_states(env, obs, info, init_states_ls, env_num, task_indexes)
 

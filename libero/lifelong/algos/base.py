@@ -110,7 +110,7 @@ class PolicyStarter(nn.Module, metaclass=AlgoMeta):
             data, lambda x: safe_device(x, device=self.cfg.device)
         )
 
-    # yy: where the optimization happens
+    # where the optimization happens
     def observe(self, data):
         """
         How the algorithm learns on each data point.
@@ -220,7 +220,7 @@ class PolicyStarter(nn.Module, metaclass=AlgoMeta):
                     )
                     successes.append(success_rate)
 
-                    # yy: save every policy instead of save the best performance one
+                    # save every policy instead of save the best performance one
                     torch_save_model(self.policy, model_checkpoint_name, cfg=self.cfg)
                     prev_success_rate = success_rate
                     idx_at_best_succ = len(losses) - 1
@@ -254,11 +254,11 @@ class PolicyStarter(nn.Module, metaclass=AlgoMeta):
             if self.scheduler is not None and epoch > 0:
                 self.scheduler.step()
 
-        # yy: Do NOT load any state_dict at the start of training a new policy
+        # Do NOT load any state_dict at the start of training a new policy
         # # load the best performance agent on the current task
         # self.policy.load_state_dict(torch_load_model(model_checkpoint_name)[0])
 
-        # yy: do nothing in end_task()
+        # do nothing in end_task()
         # end learning the current task, some algorithms need post-processing
         self.end_task(dataset, task_id, benchmark)
 
