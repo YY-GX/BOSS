@@ -314,7 +314,8 @@ for boss_suite in boss_suites:
             language = grab_language_from_filename(task + ".bddl", is_modified=False)
         else:
             # use original task's language
-            mapping_pth = f"./libero/mappings/{boss_suite}.json"
+            # mapping_pth = f"./libero/mappings/{boss_suite}.json"
+            mapping_pth = f"/mnt/arc/yygx/paper_codebases/RA-L_25/BOSS/libero/mappings/{boss_suite}.json"
             with open(mapping_pth, 'r') as json_file:
                 mapping = json.load(json_file)
             task_ori = find_keys_by_value(mapping, task + ".bddl")[0]
