@@ -1,6 +1,0 @@
-experiments
-prismatic
-runs
-scripts
-shells
-vla-scripts

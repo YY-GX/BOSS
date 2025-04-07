@@ -283,6 +283,9 @@ register_benchmark_classes("CH3_", 1, 10)
 # Generate and register G1 to G8
 register_benchmark_classes("G", 1, 8)
 
+# Generate and register Local1 TODO
+register_benchmark_classes("LOCAL", 1, 1)
+
 
 
 """
@@ -353,10 +356,11 @@ eval_ori_suites = [
     "g6",
     "g7",
     "g8",
+    "local1",  # TODO
 ]
 
 for ori_suite in eval_ori_suites:
-    task_maps[ori_suite] = task_maps["libero_90"].copy()
+     task_maps[ori_suite] = task_maps["libero_90"].copy()
 
 
 
@@ -391,6 +395,7 @@ selected_task_indexes = {
     "g6": [22, 13, 45, 64, 0],
     "g7": [0, 80, 34, 3, 10, 81, 21, 1, 19, 51],
     "g8": [81, 21, 1, 19, 51],
+    "local1": [2, 3, 4, 5, 9],  # TODO
 }
 
 
