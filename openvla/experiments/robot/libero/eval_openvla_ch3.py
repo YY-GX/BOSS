@@ -151,7 +151,7 @@ def main():
         wandb_project="YOUR_WANDB_PROJECT",
         wandb_entity="YOUR_WANDB_ENTITY",
         seed=10000,
-        unnorm_key="libero44"
+        unnorm_key="libero44"  # there might be issue for unnorm_key
     )
 
     openvla_model = get_model(openvla_cfg)
