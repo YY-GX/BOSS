@@ -408,7 +408,7 @@ selected_task_indexes = {
     "g7": [0, 80, 34, 3, 10, 81, 21, 1, 19, 51],
     "g8": [81, 21, 1, 19, 51],
     "libero_local1": [2, 3, 4, 5, 9],
-    "libero_local2": [7, 11, 13, 20, 24],
+    "libero_local2": [7, 11, 13, 20, 24, 26, 27, 30, 37, 39],
     "ch1_libero_local1": [1, 4],  # correspond to [2, \3, \4, \5, 9] - [2, 9]
     # TODO
 }
