@@ -360,11 +360,20 @@ eval_ori_suites = [
     "g7",
     "g8",
     "libero_local1",
-    "libero_local2",  # TODO
 ]
 
 for ori_suite in eval_ori_suites:
      task_maps[ori_suite] = task_maps["libero_90"].copy()
+
+
+eval_ori_suites = [
+
+    "libero_local2",  # TODO
+]
+
+for ori_suite in eval_ori_suites:
+     task_maps[ori_suite] = task_maps["boss_44"].copy()
+
 
 eval_ch1_suites = [
     "ch1_libero_local1",
@@ -408,7 +417,7 @@ selected_task_indexes = {
     "g7": [0, 80, 34, 3, 10, 81, 21, 1, 19, 51],
     "g8": [81, 21, 1, 19, 51],
     "libero_local1": [2, 3, 4, 5, 9],
-    "libero_local2": [7, 11, 13, 20, 24, 26, 27, 30, 37, 39],
+    "libero_local2": [6, 7, 10, 15, 17, 18, 19, 20, 23, 39],
     "ch1_libero_local1": [1, 4],  # correspond to [2, \3, \4, \5, 9] - [2, 9]
     # TODO
 }
