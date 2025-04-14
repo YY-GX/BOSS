@@ -7,7 +7,7 @@ import json
 
 from typing import List, NamedTuple, Type
 from libero.libero import get_libero_path
-from libero.libero.benchmark.boss_task_map import boss_task_map\
+from libero.libero.benchmark.boss_task_map import boss_task_map
 
 """
 Create global vars
@@ -287,7 +287,7 @@ register_benchmark_classes("G", 1, 8)
 register_benchmark_classes("LIBERO_LOCAL", 1, 2)
 
 # Generate and register ch1_libero_local1 TODO
-register_benchmark_classes("CH1_LIBERO_LOCAL", 1, 1)
+register_benchmark_classes("CH1_LIBERO_LOCAL", 1, 2)
 
 
 """
@@ -377,6 +377,7 @@ for ori_suite in eval_ori_suites:
 
 eval_ch1_suites = [
     "ch1_libero_local1",
+    "ch1_libero_local2",
 ]
 
 for ch1_suite in eval_ch1_suites:
@@ -417,8 +418,9 @@ selected_task_indexes = {
     "g7": [0, 80, 34, 3, 10, 81, 21, 1, 19, 51],
     "g8": [81, 21, 1, 19, 51],
     "libero_local1": [2, 3, 4, 5, 9],
-    "libero_local2": [6, 7, 10, 15, 17, 18, 19, 20, 23, 39],
+    "libero_local2": [7, 10, 15, 16, 17, 18, 19, 20, 23, 39],  # old: [6, 7, 10, 15, 17, 18, 19, 20, 23, 39] - 6 doesnt involve gripper open/close
     "ch1_libero_local1": [1, 4],  # correspond to [2, \3, \4, \5, 9] - [2, 9]
+    "ch1_libero_local2": [7, 10, 15, 16, 17, 18, 19, 20, 23, 39],
     # TODO
 }
 
