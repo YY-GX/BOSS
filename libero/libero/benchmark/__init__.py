@@ -420,7 +420,7 @@ selected_task_indexes = {
     "libero_local1": [2, 3, 4, 5, 9],
     "libero_local2": [7, 10, 15, 16, 17, 18, 19, 20, 23, 39],  # old: [6, 7, 10, 15, 17, 18, 19, 20, 23, 39] - 6 doesnt involve gripper open/close
     "ch1_libero_local1": [1, 4],  # correspond to [2, \3, \4, \5, 9] - [2, 9]
-    "ch1_libero_local2": [7, 10, 15, 16, 17, 18, 19, 20, 23, 39],
+    "ch1_libero_local2": [7, 10, 15, 16, 17, 18, 19, 20, 23, 39],  # 16 is wrong, it doesn't involve gripper closing thing -> KITCHEN_SCENE4_close_the_bottom_drawer_of_the_cabinet
     # TODO
 }
 

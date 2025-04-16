@@ -86,7 +86,7 @@
     (On white_cabinet_1 kitchen_table_white_cabinet_init_region)
     (On wine_rack_1 kitchen_table_wine_rack_init_region)
     (Open white_cabinet_1_bottom_region)
-    (On corn_1 akita_black_bowl_1)
+    (On corn_1 white_cabinet_1_bottom_region)
   )
 
   (:goal
