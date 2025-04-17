@@ -261,3 +261,65 @@ class ResnetEncoder(nn.Module):
 
     def output_shape(self, input_shape, shape_meta):
         return self.output_shape
+
+
+
+
+
+
+###############################################################################
+#
+# R3M
+# MVP
+# LIV
+#
+###############################################################################
+
+
+
+
+
+import torch
+import torch.nn as nn
+from r3m import load_r3m
+
+
+class R3MEncoder(nn.Module):
+    """
+    A wrapper around the R3M visual encoder that uses a pretrained ResNet-based
+    vision model trained on Ego4D with language supervision.
+
+    This module freezes the R3M weights and provides a fixed visual representation.
+
+    Args:
+        input_shape: (C, H, W) tuple representing the input image size.
+        output_size: desired feature output dimensionality (will apply projection).
+        model_name: backbone to use for R3M ('resnet18', 'resnet34', 'resnet50').
+    """
+
+    def __init__(self, input_shape, output_size, model_name='resnet50'):
+        super().__init__()
+        self.r3m = load_r3m(model_name)
+        self.r3m.eval()  # set to eval mode
+
+        # Freeze R3M
+        for param in self.r3m.parameters():
+            param.requires_grad = False
+
+        # Dummy forward pass to determine R3M feature dim
+        with torch.no_grad():
+            dummy_input = torch.zeros(1, *input_shape)
+            r3m_feat = self.r3m(dummy_input)
+        self.r3m_output_dim = r3m_feat.shape[-1]
+
+        # Optional projection to match expected output_size
+        self.projection = nn.Linear(self.r3m_output_dim, output_size)
+        self.output_size = output_size
+
+    def forward(self, x, langs=None):  # langs ignored; R3M is image-only
+        with torch.no_grad():
+            r3m_feat = self.r3m(x)  # (B, D)
+        return self.projection(r3m_feat)
+
+    def output_shape(self, input_shape, shape_meta=None):
+        return (self.output_size,)
