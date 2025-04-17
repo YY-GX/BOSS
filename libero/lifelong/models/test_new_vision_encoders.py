@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from r3m_encoder import R3MEncoder  # Assuming you save the class in r3m_encoder.py
+# from r3m_encoder import R3MEncoder  # Assuming you save the class in r3m_encoder.py
 from modules.rgb_modules import *
 
 def test_r3m_encoder():
