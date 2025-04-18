@@ -6,7 +6,7 @@ from modules.rgb_modules import *
 def test_r3m_encoder():
     # Dummy image input: batch of 2 RGB images of size 224x224
     dummy_images = np.random.rand(2, 3, 224, 224).astype(np.float32)
-    dummy_tensor = torch.from_numpy(dummy_images)
+    dummy_tensor = torch.from_numpy(dummy_images).to("cuda")
 
     # Initialize encoder
     encoder = R3MEncoder(input_shape=(3, 224, 224), output_size=128)
