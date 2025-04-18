@@ -9,7 +9,7 @@ def test_r3m_encoder():
     dummy_tensor = torch.from_numpy(dummy_images).to("cuda")
 
     # Initialize encoder
-    encoder = R3MEncoder(input_shape=(3, 224, 224), output_size=128)
+    encoder = R3MEncoder(input_shape=(3, 224, 224), output_size=128).to("cuda")
 
     # Forward pass
     output = encoder(dummy_tensor)
