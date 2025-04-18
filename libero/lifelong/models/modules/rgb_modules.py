@@ -301,7 +301,7 @@ class R3MEncoder(nn.Module):
         super().__init__()
         self.r3m = load_r3m(model_name)
         self.r3m.eval()  # set to eval mode
-        self.r3m.to("cuda")
+        # self.r3m.to("cuda")
 
         # Freeze R3M
         for param in self.r3m.parameters():
