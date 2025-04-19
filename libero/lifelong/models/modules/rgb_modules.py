@@ -322,6 +322,7 @@ class R3MEncoder(nn.Module):
     def forward(self, x):  # langs ignored; R3M is image-only
         with torch.no_grad():
             r3m_feat = self.r3m(x)  # (B, D)
+        print(f"R3M feature shape: {r3m_feat.shape}")
         return self.projection(r3m_feat)
 
     def output_shape(self, input_shape, shape_meta=None):
