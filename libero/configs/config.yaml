@@ -15,7 +15,7 @@ wandb_project: "BOSS Training & Evaluation"
 folder: "./libero/datasets/"
 bddl_folder: "./libero/libero/bddl_files"
 init_states_folder: "./libero/libero/init_files"
-device: "cuda:7"
+device: "cuda:6"
 task_embedding_format: "bert"
 task_embedding_one_hot_offset: 1
 pretrain: false

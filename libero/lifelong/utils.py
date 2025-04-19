@@ -23,6 +23,7 @@ def control_seed(seed):
 
 
 def safe_device(x, device="cpu"):
+    print(device)
     if device == "cpu":
         return x.cpu()
     elif "cuda" in device:
