@@ -50,13 +50,32 @@ class ExtraModalityTokens(nn.Module):
 
         assert extra_low_level_feature_dim > 0, "[error] no extra information"
 
-        self.extra_encoders = {}
+        # self.extra_encoders = {}
+        # yy: 1
+        self.extra_encoders = nn.ModuleDict()
 
+        # def generate_proprio_mlp_fn(modality_name, extra_low_level_feature_dim):
+        #     assert extra_low_level_feature_dim > 0  # we indeed have extra information
+        #     if extra_num_layers > 0:
+        #         layers = [nn.Linear(extra_low_level_feature_dim, extra_hidden_size)]
+        #         for i in range(1, extra_num_layers):
+        #             layers += [
+        #                 nn.Linear(extra_hidden_size, extra_hidden_size),
+        #                 nn.ReLU(inplace=True),
+        #             ]
+        #         layers += [nn.Linear(extra_hidden_size, extra_embedding_size)]
+        #     else:
+        #         layers = [nn.Linear(extra_low_level_feature_dim, extra_embedding_size)]
+        #
+        #     self.proprio_mlp = nn.Sequential(*layers)
+        #     self.extra_encoders[modality_name] = {"encoder": self.proprio_mlp}
+
+        # yy: 2
         def generate_proprio_mlp_fn(modality_name, extra_low_level_feature_dim):
-            assert extra_low_level_feature_dim > 0  # we indeed have extra information
+            assert extra_low_level_feature_dim > 0
             if extra_num_layers > 0:
-                layers = [nn.Linear(extra_low_level_feature_dim, extra_hidden_size)]
-                for i in range(1, extra_num_layers):
+                layers = [nn.Linear(extra_low_level_feature_dim, extra_hidden_size), nn.ReLU(inplace=True)]
+                for _ in range(1, extra_num_layers):
                     layers += [
                         nn.Linear(extra_hidden_size, extra_hidden_size),
                         nn.ReLU(inplace=True),
@@ -65,8 +84,8 @@ class ExtraModalityTokens(nn.Module):
             else:
                 layers = [nn.Linear(extra_low_level_feature_dim, extra_embedding_size)]
 
-            self.proprio_mlp = nn.Sequential(*layers)
-            self.extra_encoders[modality_name] = {"encoder": self.proprio_mlp}
+            proprio_mlp = nn.Sequential(*layers)
+            self.extra_encoders[modality_name] = proprio_mlp
 
         for (proprio_dim, use_modality, modality_name) in [
             (joint_states_dim, self.use_joint, "joint_states"),
@@ -98,12 +117,17 @@ class ExtraModalityTokens(nn.Module):
             (self.use_ee, "ee_states"),
         ]:
             print(f"[debug] {modality_name} device: {obs_dict[modality_name].device}")
-            print(f"[debug] encoder device: {next(self.extra_encoders[modality_name]['encoder'].parameters()).device}")
+            print(f"[debug] encoder device: {next(self.extra_encoders[modality_name].parameters()).device}")
             if use_modality:
                 tensor_list.append(
-                    self.extra_encoders[modality_name]["encoder"](
+                    # self.extra_encoders[modality_name]["encoder"](
+                    #     obs_dict[modality_name]
+                    # )
+                    # yy: 3
+                    self.extra_encoders[modality_name](
                         obs_dict[modality_name]
                     )
+
                 )
 
         x = torch.stack(tensor_list, dim=-2)
