@@ -120,8 +120,8 @@ class ExtraModalityTokens(nn.Module):
             (self.use_gripper, "gripper_states"),
             (self.use_ee, "ee_states"),
         ]:
-            print(f"[debug] {modality_name} device: {obs_dict[modality_name].device}")
-            print(f"[debug] encoder device: {next(self.extra_encoders[modality_name].parameters()).device}")
+            # print(f"[debug] {modality_name} device: {obs_dict[modality_name].device}")
+            # print(f"[debug] encoder device: {next(self.extra_encoders[modality_name].parameters()).device}")
             if use_modality:
                 tensor_list.append(
                     # self.extra_encoders[modality_name]["encoder"](
