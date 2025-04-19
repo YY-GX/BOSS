@@ -36,8 +36,8 @@ class PolicyStarter(nn.Module):
         base_policy = get_policy_class(cfg.policy.policy_type)(cfg, cfg.shape_meta)
         if torch.cuda.device_count() > 1:
             print(f"[info] Using {torch.cuda.device_count()} GPUs via DataParallel")
-            base_policy.to("cuda:6")
-            self.policy = nn.DataParallel(base_policy, device_ids=[6, 7])
+            base_policy.to("cuda:0")
+            self.policy = nn.DataParallel(base_policy, device_ids=[0, 1])
         else:
             self.policy = base_policy
         # self.policy = base_policy  # Always the original model (for methods like compute_loss)
