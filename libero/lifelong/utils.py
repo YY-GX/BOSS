@@ -22,14 +22,41 @@ def control_seed(seed):
     torch.backends.cudnn.deterministic = True
 
 
-def safe_device(x, device="cpu"):
+# def safe_device(x, device="cpu"):
+#     if device == "cpu":
+#         return x.cpu()
+#     elif "cuda" in device:
+#         if torch.cuda.is_available():
+#             return x.to(device)
+#         else:
+#             return x.cpu()
+
+def safe_device(model, device="cpu", verbose=True):
     if device == "cpu":
-        return x.cpu()
-    elif "cuda" in device:
-        if torch.cuda.is_available():
-            return x.to(device)
-        else:
-            return x.cpu()
+        return model.cpu()
+
+    if "cuda" in device and torch.cuda.is_available():
+        def _move_module(m):
+            for name, child in m.named_children():
+                # Recursively apply to children
+                _move_module(child)
+            try:
+                # Only move to device if not already on a different GPU
+                if hasattr(m, 'to') and next(m.parameters(), None) is not None:
+                    current_device = next(m.parameters()).device
+                    if str(current_device) != device:
+                        if verbose:
+                            print(f"Moving {m.__class__.__name__} from {current_device} to {device}")
+                        m.to(device)
+            except Exception as e:
+                if verbose:
+                    print(f"Skipping {m.__class__.__name__} due to error: {e}")
+        _move_module(model)
+        return model
+    else:
+        return model.cpu()
+
+
 
 
 class NpEncoder(json.JSONEncoder):
