@@ -307,11 +307,13 @@ class R3MEncoder(nn.Module):
         for param in self.r3m.parameters():
             param.requires_grad = False
 
-        # Dummy forward pass to determine R3M feature dim
-        with torch.no_grad():
-            dummy_input = torch.zeros(1, *input_shape)
-            r3m_feat = self.r3m(dummy_input)
-        self.r3m_output_dim = r3m_feat.shape[-1]
+        # # Dummy forward pass to determine R3M feature dim
+        # with torch.no_grad():
+        #     dummy_input = torch.zeros(1, *input_shape)
+        #     r3m_feat = self.r3m(dummy_input)
+        # self.r3m_output_dim = r3m_feat.shape[-1]
+        self.r3m_output_dim = 128
+
 
         # Optional projection to match expected output_size
         self.projection = nn.Linear(self.r3m_output_dim, output_size)
