@@ -1,4 +1,5 @@
 network: R3MEncoder
 network_kwargs:
     model_name: 'resnet50'
-    device: ${device}
+    device: "cuda:6"
+#    device: ${device}
