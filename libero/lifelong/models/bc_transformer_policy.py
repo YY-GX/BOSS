@@ -49,7 +49,8 @@ class ExtraModalityTokens(nn.Module):
 
         assert extra_low_level_feature_dim > 0, "[error] no extra information"
 
-        self.extra_encoders = {}
+        # self.extra_encoders = {}
+        self.extra_encoders = nn.ModuleDict()
 
         def generate_proprio_mlp_fn(modality_name, extra_low_level_feature_dim):
             assert extra_low_level_feature_dim > 0  # we indeed have extra information
@@ -65,7 +66,8 @@ class ExtraModalityTokens(nn.Module):
                 layers = [nn.Linear(extra_low_level_feature_dim, extra_embedding_size)]
 
             self.proprio_mlp = nn.Sequential(*layers)
-            self.extra_encoders[modality_name] = {"encoder": self.proprio_mlp}
+            # self.extra_encoders[modality_name] = {"encoder": self.proprio_mlp}
+            self.extra_encoders[modality_name] = self.proprio_mlp
 
         for (proprio_dim, use_modality, modality_name) in [
             (joint_states_dim, self.use_joint, "joint_states"),
@@ -100,13 +102,11 @@ class ExtraModalityTokens(nn.Module):
         ]:
 
             if use_modality:
-                print(f"[debug] {modality_name} device: {obs_dict[modality_name].device}")
-                print(
-                    f"[debug] encoder device: {next(self.extra_encoders[modality_name]['encoder'].parameters()).device}")
                 tensor_list.append(
-                    self.extra_encoders[modality_name]["encoder"](
-                        obs_dict[modality_name]
-                    )
+                    # self.extra_encoders[modality_name]["encoder"](
+                    #     obs_dict[modality_name]
+                    # )
+                    self.extra_encoders[modality_name](obs_dict[modality_name])
                 )
 
         x = torch.stack(tensor_list, dim=-2)
