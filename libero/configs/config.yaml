@@ -44,3 +44,4 @@ ratio: 1.0
 
 is_debug: false
 
+is_vision_encoder: false

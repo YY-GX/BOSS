@@ -179,21 +179,33 @@ class BCTransformerPolicy(BasePolicy):
         policy_cfg = cfg.policy
 
         ### 1. encode image
+        # yy: I add this
+        self.encoder_name = policy_cfg.image_encoder.network
         embed_size = policy_cfg.embed_size
         transformer_input_sizes = []
         self.image_encoders = {}
         for name in shape_meta["all_shapes"].keys():
             if "rgb" in name or "depth" in name:
-                kwargs = policy_cfg.image_encoder.network_kwargs
-                kwargs.input_shape = shape_meta["all_shapes"][name]
-                kwargs.output_size = embed_size
-                kwargs.language_dim = (
-                    policy_cfg.language_encoder.network_kwargs.input_size
-                )
-                self.image_encoders[name] = {
-                    "input_shape": shape_meta["all_shapes"][name],
-                    "encoder": eval(policy_cfg.image_encoder.network)(**kwargs),
-                }
+                # yy: I add this
+                if "R3M" in self.encoder_name:
+                    kwargs = policy_cfg.image_encoder.network_kwargs
+                    kwargs.input_shape = shape_meta["all_shapes"][name]
+                    kwargs.output_size = embed_size
+                    self.image_encoders[name] = {
+                        "input_shape": shape_meta["all_shapes"][name],
+                        "encoder": eval(policy_cfg.image_encoder.network)(**kwargs),
+                    }
+                else:
+                    kwargs = policy_cfg.image_encoder.network_kwargs
+                    kwargs.input_shape = shape_meta["all_shapes"][name]
+                    kwargs.output_size = embed_size
+                    kwargs.language_dim = (
+                        policy_cfg.language_encoder.network_kwargs.input_size
+                    )
+                    self.image_encoders[name] = {
+                        "input_shape": shape_meta["all_shapes"][name],
+                        "encoder": eval(policy_cfg.image_encoder.network)(**kwargs),
+                    }
 
         self.encoders = nn.ModuleList(
             [x["encoder"] for x in self.image_encoders.values()]
@@ -269,13 +281,19 @@ class BCTransformerPolicy(BasePolicy):
         for img_name in self.image_encoders.keys():
             x = data["obs"][img_name]
             B, T, C, H, W = x.shape
-            img_encoded = self.image_encoders[img_name]["encoder"](
-                x.reshape(B * T, C, H, W),
-                langs=data["task_emb"]
-                .reshape(B, 1, -1)
-                .repeat(1, T, 1)
-                .reshape(B * T, -1),
-            ).view(B, T, 1, -1)
+            # yy: I add this
+            if "R3M" in self.encoder_name:
+                img_encoded = self.image_encoders[img_name]["encoder"](
+                    x.reshape(B * T, C, H, W)
+                ).view(B, T, 1, -1)
+            else:
+                img_encoded = self.image_encoders[img_name]["encoder"](
+                    x.reshape(B * T, C, H, W),
+                    langs=data["task_emb"]
+                    .reshape(B, 1, -1)
+                    .repeat(1, T, 1)
+                    .reshape(B * T, -1),
+                ).view(B, T, 1, -1)
             encoded.append(img_encoded)
         encoded = torch.cat(encoded, -2)  # (B, T, num_modalities, E)
         return encoded

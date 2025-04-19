@@ -297,11 +297,11 @@ class R3MEncoder(nn.Module):
         model_name: backbone to use for R3M ('resnet18', 'resnet34', 'resnet50').
     """
 
-    def __init__(self, input_shape, output_size, model_name='resnet50', device=0):
+    def __init__(self, input_shape, output_size, model_name='resnet50', device="cuda:0"):
         super().__init__()
         self.r3m = load_r3m(model_name)
         self.r3m.eval()  # set to eval mode
-        self.r3m.to(f"cuda:{device}")
+        self.r3m.to(device)
 
         # Freeze R3M
         for param in self.r3m.parameters():
@@ -317,7 +317,7 @@ class R3MEncoder(nn.Module):
         self.projection = nn.Linear(self.r3m_output_dim, output_size)
         self.output_size = output_size
 
-    def forward(self, x, langs=None):  # langs ignored; R3M is image-only
+    def forward(self, x):  # langs ignored; R3M is image-only
         with torch.no_grad():
             r3m_feat = self.r3m(x)  # (B, D)
         return self.projection(r3m_feat)

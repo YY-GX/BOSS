@@ -1,0 +1,4 @@
+network: R3MEncoder
+network_kwargs:
+    model_name: 'resnet50'
+    device: ${device}
