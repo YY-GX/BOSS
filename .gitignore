@@ -30,3 +30,6 @@ openvla/datasets/*
 # Allow tracking experiments under openvla
 !openvla/experiments/
 !openvla/prismatic/vla/datasets/
+
+# for revise pkgs
+r3m
