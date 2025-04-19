@@ -78,9 +78,10 @@ class ExtraModalityTokens(nn.Module):
             if use_modality:
                 generate_proprio_mlp_fn(modality_name, proprio_dim)
 
-        self.encoders = nn.ModuleList(
-            [x["encoder"] for x in self.extra_encoders.values()]
-        )
+        # self.encoders = nn.ModuleList(
+        #     [x["encoder"] for x in self.extra_encoders.values()]
+        # )
+        self.encoders = nn.ModuleList(list(self.extra_encoders.values()))
 
     def forward(self, obs_dict):
         """
