@@ -145,7 +145,7 @@ def evaluate_one_task_success(
                 steps += 1
 
                 data = raw_obs_to_tensor_obs(obs, task_emb, cfg)
-                actions = algo.policy.get_action(data)
+                actions = algo.policy.module.get_action(data)
 
                 obs, reward, done, info = env.step(actions)
                 if video_folder:
@@ -242,7 +242,7 @@ def evaluate_loss(cfg, algo, benchmark, datasets):
             data = TensorUtils.map_tensor(
                 data, lambda x: safe_device(x, device=cfg.device)
             )
-            loss = algo.policy.compute_loss(data)
+            loss = algo.policy.module.compute_loss(data)
             test_loss += loss.item()
         test_loss /= len(dataloader)
         losses.append(test_loss)
