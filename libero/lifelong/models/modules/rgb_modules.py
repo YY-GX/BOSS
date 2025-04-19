@@ -312,7 +312,7 @@ class R3MEncoder(nn.Module):
         #     dummy_input = torch.zeros(1, *input_shape)
         #     r3m_feat = self.r3m(dummy_input)
         # self.r3m_output_dim = r3m_feat.shape[-1]
-        self.r3m_output_dim = 128
+        self.r3m_output_dim = 2048
 
 
         # Optional projection to match expected output_size
@@ -322,7 +322,7 @@ class R3MEncoder(nn.Module):
     def forward(self, x):  # langs ignored; R3M is image-only
         with torch.no_grad():
             r3m_feat = self.r3m(x)  # (B, D)
-        print(f"R3M feature shape: {r3m_feat.shape}")
+        # print(f"R3M feature shape: {r3m_feat.shape}")
         return self.projection(r3m_feat)
 
     def output_shape(self, input_shape, shape_meta=None):
