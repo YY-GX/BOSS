@@ -89,6 +89,8 @@ class ExtraModalityTokens(nn.Module):
         }
         map above to a latent vector of shape (B, T, H)
         """
+
+
         tensor_list = []
 
         for (use_modality, modality_name) in [
@@ -98,6 +100,9 @@ class ExtraModalityTokens(nn.Module):
         ]:
 
             if use_modality:
+                print(f"[debug] {modality_name} device: {obs_dict[modality_name].device}")
+                print(
+                    f"[debug] encoder device: {next(self.extra_encoders[modality_name]['encoder'].parameters()).device}")
                 tensor_list.append(
                     self.extra_encoders[modality_name]["encoder"](
                         obs_dict[modality_name]
@@ -266,6 +271,7 @@ class BCTransformerPolicy(BasePolicy):
         return x[:, :, 0]  # (B, T, E)
 
     def spatial_encode(self, data):
+
         # 1. encode extra
         extra = self.extra_encoder(data["obs"])  # (B, T, num_extra, E)
 
