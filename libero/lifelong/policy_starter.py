@@ -33,10 +33,13 @@ class PolicyStarter(nn.Module):
 
         # self.policy = get_policy_class(cfg.policy.policy_type)(cfg, cfg.shape_meta)
         # yy: change to DP
-        self.policy = get_policy_class(cfg.policy.policy_type)(cfg, cfg.shape_meta)
+        base_policy = get_policy_class(cfg.policy.policy_type)(cfg, cfg.shape_meta)
         if torch.cuda.device_count() > 1:
             print(f"[info] Using {torch.cuda.device_count()} GPUs via DataParallel")
-            self.policy = nn.DataParallel(self.policy, device_ids=[6, 7])
+            self.policy = nn.DataParallel(base_policy, device_ids=[6, 7])
+        else:
+            self.policy = base_policy
+        # self.policy = base_policy  # Always the original model (for methods like compute_loss)
 
         self.current_task = -1
 
@@ -54,7 +57,7 @@ class PolicyStarter(nn.Module):
 
         # initialize the optimizer and scheduler
         self.optimizer = eval(self.cfg.train.optimizer.name)(
-            self.policy.parameters(), **self.cfg.train.optimizer.kwargs
+            self.policy.module.parameters(), **self.cfg.train.optimizer.kwargs
         )
 
         self.scheduler = None
@@ -79,7 +82,7 @@ class PolicyStarter(nn.Module):
         """
         data = self.map_tensor_to_device(data)
         self.optimizer.zero_grad()
-        loss = self.policy.compute_loss(data)
+        loss = self.policy.module.compute_loss(data)
         (self.loss_scale * loss).backward()
         if self.cfg.train.grad_clip is not None:
             grad_norm = nn.utils.clip_grad_norm_(
@@ -92,7 +95,7 @@ class PolicyStarter(nn.Module):
     def eval_observe(self, data):
         data = self.map_tensor_to_device(data)
         with torch.no_grad():
-            loss = self.policy.compute_loss(data)
+            loss = self.policy.module.compute_loss(data)
         return loss.item()
 
 
@@ -189,4 +192,4 @@ class PolicyStarter(nn.Module):
 
 
     def reset(self):
-        self.policy.reset()
+        self.policy.module.reset()
