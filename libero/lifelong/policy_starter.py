@@ -31,7 +31,13 @@ class PolicyStarter(nn.Module):
         self.experiment_dir = cfg.experiment_dir
         self.algo = cfg.lifelong.algo
 
+        # self.policy = get_policy_class(cfg.policy.policy_type)(cfg, cfg.shape_meta)
+        # yy: change to DP
         self.policy = get_policy_class(cfg.policy.policy_type)(cfg, cfg.shape_meta)
+        if torch.cuda.device_count() > 1:
+            print(f"[info] Using {torch.cuda.device_count()} GPUs via DataParallel")
+            self.policy = nn.DataParallel(self.policy, device_ids=[6, 7])
+
         self.current_task = -1
 
     def end_task(self, dataset, task_id, benchmark, env=None):

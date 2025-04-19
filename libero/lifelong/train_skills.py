@@ -140,7 +140,9 @@ def main(hydra_cfg):
         # Save the experiment config file, so we can resume or replay later
         with open(os.path.join(cfg.experiment_dir, f"config_task{i}.json"), "w") as f:
             json.dump(cfg, f, cls=NpEncoder, indent=4)
-        policy_starter = safe_device(PolicyStarter(n_tasks, cfg), cfg.device)
+        #     yy: i comment this
+        # policy_starter = safe_device(PolicyStarter(n_tasks, cfg), cfg.device)
+        policy_starter = PolicyStarter(n_tasks, cfg)
         print(f"[info] start training on task {i}")
         policy_starter.train()
         t0 = time.time()
