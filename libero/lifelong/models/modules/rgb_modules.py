@@ -327,3 +327,54 @@ class R3MEncoder(nn.Module):
 
     def output_shape(self, input_shape, shape_meta=None):
         return (self.output_size,)
+
+
+
+import torch
+import torch.nn as nn
+import mvp  # make sure `pip install git+https://github.com/ir413/mvp` is run
+
+class MVPEncoder(nn.Module):
+    """
+    A wrapper around the MVP visual encoder that uses a pretrained ViT-based
+    model trained with Masked Autoencoding for robotic visual tasks.
+
+    This module freezes the MVP weights and provides a fixed visual representation.
+
+    Args:
+        input_shape: (C, H, W) tuple representing the input image size.
+        output_size: desired feature output dimensionality (will apply projection).
+        model_name: pre-trained model identifier ('vits-mae-egosoup', 'vitb-mae-egosoup', etc.).
+    """
+
+    def __init__(self, input_shape, output_size, model_name="vitb-mae-egosoup", device="cuda:0"):
+        super().__init__()
+        self.mvp = mvp.load(model_name).to(device)
+        self.mvp.eval()
+        model.freeze()
+
+        # # Freeze MVP
+        # for param in self.mvp.parameters():
+        #     param.requires_grad = False
+
+        # MVP ViT-B outputs 768-dimensional embeddings (for vitb); adjust if needed
+        if "vits" in model_name:
+            self.mvp_output_dim = 384
+        elif "vitb" in model_name:
+            self.mvp_output_dim = 768
+        elif "vitl" in model_name:
+            self.mvp_output_dim = 1024
+        else:
+            raise ValueError(f"Unknown model type in model_name: {model_name}")
+
+        # Optional projection to match expected output_size
+        self.projection = nn.Linear(self.mvp_output_dim, output_size)
+        self.output_size = output_size
+
+    def forward(self, x):  # x should be normalized (B, 3, H, W)
+        with torch.no_grad():
+            mvp_feat = self.mvp(x)  # (B, D)
+        return self.projection(mvp_feat)
+
+    def output_shape(self, input_shape, shape_meta=None):
+        return (self.output_size,)

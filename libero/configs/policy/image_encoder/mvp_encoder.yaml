@@ -1,0 +1,5 @@
+network: MVPEncoder
+network_kwargs:
+    model_name: "vitb-mae-egosoup"
+    device: "cuda:0"
+#    device: ${device}
