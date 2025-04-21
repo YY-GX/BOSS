@@ -33,7 +33,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 
-@hydra.main(config_path="../configs", config_name="config", version_base=None)
+@hydra.main(config_path="../configs", config_name="config")
 def main(hydra_cfg):
     """
     Description: main() function for training separate skills
