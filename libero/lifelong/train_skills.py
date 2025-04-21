@@ -75,6 +75,11 @@ def main(hydra_cfg):
     descriptions = []
     shape_meta = None
     for i in range(n_manip_tasks):
+        import os
+        print(f"[DEBUG] cwd: {os.getcwd()}")
+        print(f"[DEBUG] dataset_path: {os.path.join(cfg.folder, benchmark.get_task_demonstration(i))}")
+        print(f"[DEBUG] Exists? {os.path.exists(os.path.join(cfg.folder, benchmark.get_task_demonstration(i)))}")
+
         task_i_dataset, shape_meta = get_dataset(
             dataset_path=os.path.join(
                 cfg.folder, benchmark.get_task_demonstration(i)
