@@ -390,8 +390,8 @@ for ch1_suite in eval_ch1_suites:
 Created Tasks Indexes
 """
 selected_task_indexes = {
-    # "boss_44": [i for i in range(0, 44)],  # TODO: uncomment this
-    "boss_44": [i for i in range(33, 44)],
+    "boss_44": [i for i in range(0, 44)],  # TODO: uncomment this
+    # "boss_44": [i for i in range(33, 44)],
     "ch1": [i for i in range(0, 44)],
     "ch2_2_modifications": [i for i in range(0, 44)],
     "ch2_3_modifications": [i for i in range(0, 44)],
