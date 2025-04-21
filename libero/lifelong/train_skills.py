@@ -33,7 +33,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 
-@hydra.main(config_path="../configs", config_name="config")
+@hydra.main(config_path="../configs", config_name="config", version_base=None)
 def main(hydra_cfg):
     """
     Description: main() function for training separate skills
@@ -75,36 +75,37 @@ def main(hydra_cfg):
     descriptions = []
     shape_meta = None
     for i in range(n_manip_tasks):
-        import os
-        print(f"[DEBUG] cwd: {os.getcwd()}")
-        print(f"[DEBUG] dataset_path: {os.path.join(cfg.folder, benchmark.get_task_demonstration(i))}")
-        print(f"[DEBUG] Exists? {os.path.exists(os.path.join(cfg.folder, benchmark.get_task_demonstration(i)))}")
+        # import os
+        # print(f"[DEBUG] cwd: {os.getcwd()}")
+        # print(f"[DEBUG] dataset_path: {os.path.join(cfg.folder, benchmark.get_task_demonstration(i))}")
+        # print(f"[DEBUG] Exists? {os.path.exists(os.path.join(cfg.folder, benchmark.get_task_demonstration(i)))}")
+        #
+        # task_i_dataset, shape_meta = get_dataset(
+        #     dataset_path=os.path.join(
+        #         cfg.folder, benchmark.get_task_demonstration(i)
+        #     ),
+        #     obs_modality=cfg.data.obs.modality,
+        #     initialize_obs_utils=True,
+        #     seq_len=cfg.data.seq_len,
+        # )
 
-        task_i_dataset, shape_meta = get_dataset(
-            dataset_path=os.path.join(
-                cfg.folder, benchmark.get_task_demonstration(i)
-            ),
-            obs_modality=cfg.data.obs.modality,
-            initialize_obs_utils=True,
-            seq_len=cfg.data.seq_len,
-        )
+        # currently we assume tasks from same benchmark have the same shape_meta
+        try:
+            task_i_dataset, shape_meta = get_dataset(
+                dataset_path=os.path.join(
+                    cfg.folder, benchmark.get_task_demonstration(i)
+                ),
+                obs_modality=cfg.data.obs.modality,
+                initialize_obs_utils=True,
+                seq_len=cfg.data.seq_len,
+            )
+        except Exception as e:
+            print(
+                f"[error] failed to load task {i} name {benchmark.get_task_names()[i]}"
+            )
+            print(f"[error] {e}")
+            exit(1)
 
-        # # currently we assume tasks from same benchmark have the same shape_meta
-        # try:
-        #     task_i_dataset, shape_meta = get_dataset(
-        #         dataset_path=os.path.join(
-        #             cfg.folder, benchmark.get_task_demonstration(i)
-        #         ),
-        #         obs_modality=cfg.data.obs.modality,
-        #         initialize_obs_utils=True,
-        #         seq_len=cfg.data.seq_len,
-        #     )
-        # except Exception as e:
-        #     print(
-        #         f"[error] failed to load task {i} name {benchmark.get_task_names()[i]}"
-        #     )
-        #     print(f"[error] {e}")
-        #     exit(1)
         # add language to the vision dataset, hence we call vl_dataset
         task_description = benchmark.get_task(i).language
         # maintain a list containing (lang, ds)
