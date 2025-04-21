@@ -110,7 +110,7 @@ def compute_flops(algo, dataset, cfg):
 
 def create_experiment_dir(cfg, version=None):
     if cfg.is_vision_encoder:
-        prefix = "./experiments_vision_encoder"
+        prefix = f"./experiments_vision_encoder/{cfg.policy.image_encoder.network}/"
     else:
         prefix = "./experiments"
     if version:
