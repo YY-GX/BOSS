@@ -378,3 +378,55 @@ class MVPEncoder(nn.Module):
 
     def output_shape(self, input_shape, shape_meta=None):
         return (self.output_size,)
+
+
+import torch
+import torch.nn as nn
+from liv import load_liv
+import clip
+
+
+class LIVEncoder(nn.Module):
+    """
+    A wrapper around the LIV multi-modal encoder that computes embeddings for both
+    vision and language inputs. It uses a frozen CLIP-based encoder trained with
+    language and vision alignment for robotic tasks.
+
+    Args:
+        input_shape: (C, H, W) tuple representing the input image size.
+        output_size: dimensionality of the projected embedding.
+        device: device for running the model.
+    """
+
+    def __init__(self, input_shape, output_size, device="cuda:0"):
+        super().__init__()
+        self.device = device
+        self.liv = load_liv().to(device)
+        self.liv.eval()
+
+        for param in self.liv.parameters():
+            param.requires_grad = False
+
+        # LIV uses a 512-d output embedding (CLIP ViT-B/32 typically)
+        self.liv_output_dim = 512
+        self.output_size = output_size
+
+        # Optional projection
+        self.projection = nn.Linear(self.liv_output_dim, output_size)
+
+    def forward(self, x):
+        """
+        Args:
+            x (torch.Tensor): Image tensor (B, 3, H, W)
+
+        Returns:
+            Tuple[torch.Tensor, torch.Tensor]: projected image features, projected text features
+        """
+
+        with torch.no_grad():
+            image_embedding = self.liv(input=x.to(self.device), modality="vision")   # (B, D)
+
+        return self.projection(image_embedding)
+
+    def output_shape(self, input_shape, shape_meta=None):
+        return (self.output_size,)

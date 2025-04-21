@@ -221,7 +221,7 @@ class BCTransformerPolicy(BasePolicy):
         for name in shape_meta["all_shapes"].keys():
             if "rgb" in name or "depth" in name:
                 # yy: I add this
-                if ("R3M" in self.encoder_name) or ("MVP" in self.encoder_name):
+                if ("R3M" in self.encoder_name) or ("MVP" in self.encoder_name) or ("LIV" in self.encoder_name):
                     kwargs = policy_cfg.image_encoder.network_kwargs
                     kwargs.input_shape = shape_meta["all_shapes"][name]
                     kwargs.output_size = embed_size
@@ -317,7 +317,7 @@ class BCTransformerPolicy(BasePolicy):
             x = data["obs"][img_name]
             B, T, C, H, W = x.shape
             # yy: I add this
-            if ("R3M" in self.encoder_name) or ("MVP" in self.encoder_name):
+            if ("R3M" in self.encoder_name) or ("MVP" in self.encoder_name) or ("LIV" in self.encoder_name):
                 img_encoded = self.image_encoders[img_name]["encoder"](
                     x.reshape(B * T, C, H, W)
                 ).view(B, T, 1, -1)

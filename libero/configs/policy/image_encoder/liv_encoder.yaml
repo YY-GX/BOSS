@@ -1,0 +1,4 @@
+network: R3MEncoder
+network_kwargs:
+    device: "cuda:0"
+#    device: ${device}
