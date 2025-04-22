@@ -408,7 +408,7 @@ class LIVEncoder(nn.Module):
             param.requires_grad = False
 
         # LIV uses a 512-d output embedding (CLIP ViT-B/32 typically)
-        self.liv_output_dim = 512
+        self.liv_output_dim = 1024
         self.output_size = output_size
 
         # Optional projection
