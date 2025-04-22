@@ -38,7 +38,7 @@ def parse_args():
     )
     parser.add_argument("--seed", type=int, required=True, default=10000)
     parser.add_argument("--device_id", type=int, default=0)
-    parser.add_argument("--is_debug", type=int, default=1)
+    parser.add_argument("--is_debug", type=int, default=0)
     args = parser.parse_args()
     args.device_id = "cuda:" + str(args.device_id)
     return args
