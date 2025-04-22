@@ -98,7 +98,8 @@ def main():
         # Create algo
         # algo = safe_device(PolicyStarter(n_tasks, cfg), cfg.device)
         algo = PolicyStarter(n_tasks, cfg)
-        algo.policy.load_state_dict(sd)
+        stripped_sd = {k.replace('module.', '', 1): v for k, v in sd.items()}
+        algo.policy.load_state_dict(stripped_sd)
 
         # Obtain language embs & task
         task_embs = get_task_embs(cfg, descriptions)
