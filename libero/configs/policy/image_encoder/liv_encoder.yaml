@@ -1,4 +1,4 @@
-network: R3MEncoder
+network: LIVEncoder
 network_kwargs:
     device: "cuda:0"
 #    device: ${device}
