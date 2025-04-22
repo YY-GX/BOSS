@@ -425,6 +425,8 @@ class LIVEncoder(nn.Module):
 
         with torch.no_grad():
             image_embedding = self.liv(input=x.to(self.device), modality="vision")   # (B, D)
+        print("image_embedding dtype:", image_embedding.dtype)
+        print("projection weight dtype:", self.projection.weight.dtype)
 
         return self.projection(image_embedding)
 
