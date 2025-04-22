@@ -157,7 +157,7 @@ def main(hydra_cfg):
             json.dump(cfg, f, cls=NpEncoder, indent=4)
         #     yy: i comment this
         # policy_starter = safe_device(PolicyStarter(n_tasks, cfg), cfg.device)
-        policy_starter = PolicyStarter(n_tasks, cfg)
+        policy_starter = PolicyStarter(n_tasks, cfg, is_multi_gpu=True)
         print(f"[info] start training on task {i}")
         policy_starter.train()
         t0 = time.time()

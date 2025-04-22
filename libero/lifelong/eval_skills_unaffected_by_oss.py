@@ -83,12 +83,21 @@ def main():
         cfg.bddl_folder = get_libero_path("bddl_files")
         cfg.init_states_folder = get_libero_path("init_states")
         cfg.device = args.device_id
-        save_dir = os.path.join(args.model_path_folder, f"eval_tasks_on_ori_envs_seed{args.seed}", f"evaluation_task{task_id}_on_ori_envs")
+        if "R3M" in args.model_path_folder:
+            save_dir = os.path.join(args.model_path_folder, f"eval_tasks_on_ori_envs_R3M_seed{args.seed}",
+                                    f"evaluation_task{task_id}_on_ori_envs")
+        elif "LIV" in args.model_path_folder:
+            save_dir = os.path.join(args.model_path_folder, f"eval_tasks_on_ori_envs_LIV_seed{args.seed}",
+                                    f"evaluation_task{task_id}_on_ori_envs")
+        else:
+            save_dir = os.path.join(args.model_path_folder, f"eval_tasks_on_ori_envs_seed{args.seed}",
+                                    f"evaluation_task{task_id}_on_ori_envs")
         print(f">> Create folder {save_dir}")
         os.system(f"mkdir -p {save_dir}")
 
         # Create algo
-        algo = safe_device(PolicyStarter(n_tasks, cfg), cfg.device)
+        # algo = safe_device(PolicyStarter(n_tasks, cfg), cfg.device)
+        algo = PolicyStarter(n_tasks, cfg)
         algo.policy.load_state_dict(sd)
 
         # Obtain language embs & task

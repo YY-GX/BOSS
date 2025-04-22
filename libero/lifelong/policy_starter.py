@@ -18,7 +18,7 @@ class PolicyStarter(nn.Module):
     For skill training
     """
 
-    def __init__(self, n_tasks, cfg):
+    def __init__(self, n_tasks, cfg, is_multi_gpu=False):
         super().__init__()
         self.cfg = cfg
         self.loss_scale = cfg.train.loss_scale
@@ -34,10 +34,14 @@ class PolicyStarter(nn.Module):
         # self.policy = get_policy_class(cfg.policy.policy_type)(cfg, cfg.shape_meta)
         # yy: change to DP
         base_policy = get_policy_class(cfg.policy.policy_type)(cfg, cfg.shape_meta)
-        if torch.cuda.device_count() > 1:
+        if is_multi_gpu:
             print(f"[info] Using {torch.cuda.device_count()} GPUs via DataParallel")
             base_policy.to("cuda:0")
             self.policy = nn.DataParallel(base_policy, device_ids=[0, 1])
+        elif torch.cuda.device_count() > 0:
+            print(f"[info] Using {torch.cuda.device_count()} GPU")
+            base_policy.to("cuda:0")
+            self.policy = base_policy
         else:
             self.policy = base_policy
         # self.policy = base_policy  # Always the original model (for methods like compute_loss)
@@ -57,9 +61,14 @@ class PolicyStarter(nn.Module):
         self.current_task = task
 
         # initialize the optimizer and scheduler
-        self.optimizer = eval(self.cfg.train.optimizer.name)(
-            self.policy.module.parameters(), **self.cfg.train.optimizer.kwargs
-        )
+        if isinstance(self.policy, nn.DataParallel):
+            self.optimizer = eval(self.cfg.train.optimizer.name)(
+                self.policy.module.parameters(), **self.cfg.train.optimizer.kwargs
+            )
+        else:
+            self.optimizer = eval(self.cfg.train.optimizer.name)(
+                self.policy.parameters(), **self.cfg.train.optimizer.kwargs
+            )
 
         self.scheduler = None
         if self.cfg.train.scheduler is not None:
@@ -83,7 +92,10 @@ class PolicyStarter(nn.Module):
         """
         data = self.map_tensor_to_device(data)
         self.optimizer.zero_grad()
-        loss = self.policy.module.compute_loss(data)
+        if isinstance(self.policy, nn.DataParallel):
+            loss = self.policy.module.compute_loss(data)
+        else:
+            loss = self.policy.compute_loss(data)
         (self.loss_scale * loss).backward()
         if self.cfg.train.grad_clip is not None:
             grad_norm = nn.utils.clip_grad_norm_(
@@ -96,7 +108,11 @@ class PolicyStarter(nn.Module):
     def eval_observe(self, data):
         data = self.map_tensor_to_device(data)
         with torch.no_grad():
-            loss = self.policy.module.compute_loss(data)
+            if isinstance(self.policy, nn.DataParallel):
+                loss = self.policy.module.compute_loss(data)
+            else:
+                loss = self.policy.compute_loss(data)
+
         return loss.item()
 
 
@@ -193,4 +209,8 @@ class PolicyStarter(nn.Module):
 
 
     def reset(self):
-        self.policy.module.reset()
+        if isinstance(self.policy, nn.DataParallel):
+            self.policy.module.reset()
+        else:
+            self.policy.reset()
+
