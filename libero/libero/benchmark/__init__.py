@@ -284,10 +284,10 @@ register_benchmark_classes("CH3_", 1, 10)
 register_benchmark_classes("G", 1, 8)
 
 # Generate and register libero_local1 TODO
-register_benchmark_classes("LIBERO_LOCAL", 1, 2)
+register_benchmark_classes("LIBERO_LOCAL", 1, 3)
 
 # Generate and register ch1_libero_local1 TODO
-register_benchmark_classes("CH1_LIBERO_LOCAL", 1, 2)
+register_benchmark_classes("CH1_LIBERO_LOCAL", 1, 3)
 
 
 """
@@ -367,8 +367,8 @@ for ori_suite in eval_ori_suites:
 
 
 eval_ori_suites = [
-
-    "libero_local2",  # TODO
+    "libero_local2",
+    "libero_local3",  # TODO
 ]
 
 for ori_suite in eval_ori_suites:
@@ -378,6 +378,7 @@ for ori_suite in eval_ori_suites:
 eval_ch1_suites = [
     "ch1_libero_local1",
     "ch1_libero_local2",
+    "ch1_libero_local3",
 ]
 
 for ch1_suite in eval_ch1_suites:
@@ -390,10 +391,7 @@ for ch1_suite in eval_ch1_suites:
 Created Tasks Indexes
 """
 selected_task_indexes = {
-    "boss_44": [i for i in range(0, 44)],  # TODO: uncomment this
-    # "boss_44": [i for i in range(33, 44)],
-    # "boss_44": [i for i in range(6, 44)],  # TODO: uncomment this
-    # "boss_44": [i for i in range(24, 44)],  # TODO: uncomment this
+    "boss_44": [i for i in range(0, 44)],
     "ch1": [i for i in range(0, 44)],
     "ch2_2_modifications": [i for i in range(0, 44)],
     "ch2_3_modifications": [i for i in range(0, 44)],
@@ -421,8 +419,10 @@ selected_task_indexes = {
     "g8": [81, 21, 1, 19, 51],
     "libero_local1": [2, 3, 4, 5, 9],
     "libero_local2": [7, 10, 15, 16, 17, 18, 19, 20, 23, 39],  # old: [6, 7, 10, 15, 17, 18, 19, 20, 23, 39] - 6 doesnt involve gripper open/close
+    "libero_local3": [5, 24, 25, 29, 30, 32, 33, 37, 41, 43],
     "ch1_libero_local1": [1, 4],  # correspond to [2, \3, \4, \5, 9] - [2, 9]
     "ch1_libero_local2": [7, 10, 15, 16, 17, 18, 19, 20, 23, 39],  # 16 is wrong, it doesn't involve gripper closing thing -> KITCHEN_SCENE4_close_the_bottom_drawer_of_the_cabinet
+    "ch1_libero_local3": [5, 24, 25, 29, 30, 32, 33, 37, 41, 43],
     # TODO
 }
 
