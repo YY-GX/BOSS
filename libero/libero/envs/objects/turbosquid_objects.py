@@ -254,6 +254,20 @@ class LargerRedCoffeeMug(TurbosquidObjects):
         self.rotation = (-np.pi / 2, -np.pi / 2)
 
 
+# scale: 0.6
+@register_object
+class SmallerRedCoffeeMug(TurbosquidObjects):
+    def __init__(
+        self,
+        name="smaller_red_coffee_mug",
+        obj_name="smaller_red_coffee_mug",
+        joints=[dict(type="free", damping="0.0005")],
+    ):
+        super().__init__(name, obj_name, joints)
+        self.rotation = (-np.pi / 2, -np.pi / 2)
+
+
+
 # scale: 0.75
 @register_object
 class SmallerPorcelainMug(TurbosquidObjects):

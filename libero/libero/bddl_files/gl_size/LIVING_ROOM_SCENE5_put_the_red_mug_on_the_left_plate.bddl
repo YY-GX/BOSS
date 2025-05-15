@@ -46,7 +46,7 @@
             )
           )
       )
-      (larger_red_coffee_mug_init_region
+      (smaller_red_coffee_mug_init_region
           (:target living_room_table)
           (:ranges (
               (-0.225 -0.025 -0.17500000000000002 0.025)
@@ -65,26 +65,26 @@
 
   (:objects
     porcelain_mug_1 - porcelain_mug
-    larger_red_coffee_mug_1 - larger_red_coffee_mug
+    smaller_red_coffee_mug_1 - smaller_red_coffee_mug
     white_yellow_mug_1 - white_yellow_mug
     plate_1 plate_2 - plate
   )
 
   (:obj_of_interest
-    larger_red_coffee_mug_1
+    smaller_red_coffee_mug_1
     plate_1
   )
 
   (:init
     (On plate_1 living_room_table_plate_left_region)
     (On plate_2 living_room_table_plate_right_region)
-    (On larger_red_coffee_mug_1 living_room_table_larger_red_coffee_mug_init_region)
+    (On smaller_red_coffee_mug_1 living_room_table_smaller_red_coffee_mug_init_region)
     (On white_yellow_mug_1 living_room_table_white_yellow_mug_init_region)
     (On porcelain_mug_1 living_room_table_porcelain_mug_init_region)
   )
 
   (:goal
-    (And (On larger_red_coffee_mug_1 plate_1))
+    (And (On smaller_red_coffee_mug_1 plate_1))
   )
 
 )
