@@ -1,6 +1,7 @@
 import torch
 from libero.libero.envs import OffScreenRenderEnv
 import os
+import random
 
 def create_init(bddl_file_name, suite_name):
     N_init, N_pruned_init = 50, 20
