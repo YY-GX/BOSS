@@ -223,38 +223,19 @@ class LIBERO_90(Benchmark):
         super().__init__(n_tasks=n_tasks)
         self._make_benchmark()
 
+@register_benchmark
+class GL_SIZE(Benchmark):
+    def __init__(self, n_tasks=None):
+        self.name = "gl_size"
+        super().__init__(n_tasks=n_tasks)
+        self._make_benchmark()
 
-# @register_benchmark
-# class G1(Benchmark):
-#     def __init__(self, n_tasks=None):
-#         self.name = "g1"
-#         super().__init__(n_tasks=n_tasks)
-#         self._make_benchmark()
-#
-#
-# @register_benchmark
-# class G2(Benchmark):
-#     def __init__(self, n_tasks=None):
-#         self.name = "g2"
-#         super().__init__(n_tasks=n_tasks)
-#         self._make_benchmark()
-#
-#
-# @register_benchmark
-# class G3(Benchmark):
-#     def __init__(self, n_tasks=None):
-#         self.name = "g3"
-#         super().__init__(n_tasks=n_tasks)
-#         self._make_benchmark()
-#
-#
-# @register_benchmark
-# class G4(Benchmark):
-#     def __init__(self, n_tasks=None):
-#         self.name = "g4"
-#         super().__init__(n_tasks=n_tasks)
-#         self._make_benchmark()
-
+@register_benchmark
+class GL_COLOR(Benchmark):
+    def __init__(self, n_tasks=None):
+        self.name = "gl_color"
+        super().__init__(n_tasks=n_tasks)
+        self._make_benchmark()
 
 def create_benchmark_class(name):
     """Dynamically creates a Benchmark subclass with a given name."""
@@ -302,6 +283,8 @@ boss_suites = [
     "factor_2",
     "data_augmentation",
     "libero_90",
+    "gl_size",
+    "gl_color"
 ]
 
 task_maps = {}
