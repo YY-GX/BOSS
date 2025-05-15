@@ -300,3 +300,12 @@ class LargerChocolatePudding(HopeBaseObject):
         super().__init__(name, obj_name)
         self.rotation = (0.0, 0.0)
         self.rotation_axis = "x"
+
+
+# scale: 0.75
+@register_object
+class SmallerChocolatePudding(HopeBaseObject):
+    def __init__(self, name="smaller_chocolate_pudding", obj_name="smaller_chocolate_pudding"):
+        super().__init__(name, obj_name)
+        self.rotation = (0.0, 0.0)
+        self.rotation_axis = "x"
