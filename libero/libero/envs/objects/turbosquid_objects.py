@@ -241,7 +241,7 @@ class SmallerMokaPot(TurbosquidObjects):
         super().__init__(name, obj_name, joints)
 
 
-# scale: 1.5
+# scale: 1.25
 @register_object
 class LargerRedCoffeeMug(TurbosquidObjects):
     def __init__(

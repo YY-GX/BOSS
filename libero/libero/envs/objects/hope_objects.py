@@ -293,7 +293,7 @@ class SmallerKetchup(HopeBaseObject):
         self.rotation_axis = None
 
 
-# scale: 1.5
+# scale: 1.25
 @register_object
 class LargerChocolatePudding(HopeBaseObject):
     def __init__(self, name="larger_chocolate_pudding", obj_name="larger_chocolate_pudding"):
