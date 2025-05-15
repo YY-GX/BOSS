@@ -17,10 +17,18 @@ from libero.libero.envs.base_object import (
 
 class GoogleScannedObject(MujocoXMLObject):
     def __init__(self, name, obj_name, joints=[dict(type="free", damping="0.0005")]):
+        # yy: I add these
+        if obj_name.startswith("smaller_"):
+            base_name = obj_name[len("smaller_"):]
+        elif obj_name.startswith("larger_"):
+            base_name = obj_name[len("larger_"):]
+        else:
+            base_name = obj_name
+
         super().__init__(
             os.path.join(
                 str(absolute_path),
-                f"assets/stable_scanned_objects/{obj_name}/{obj_name}.xml",
+                f"assets/stable_scanned_objects/{obj_name}/{base_name}.xml",
             ),
             name=name,
             joints=joints,

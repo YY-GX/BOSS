@@ -16,11 +16,19 @@ from libero.libero.envs.base_object import (
 
 
 class TurbosquidObjects(MujocoXMLObject):
+    # yy: I add these
+    if obj_name.startswith("smaller_"):
+        base_name = obj_name[len("smaller_"):]
+    elif obj_name.startswith("larger_"):
+        base_name = obj_name[len("larger_"):]
+    else:
+        base_name = obj_name
+
     def __init__(self, name, obj_name, joints=[dict(type="free", damping="0.0005")]):
         super().__init__(
             os.path.join(
                 str(absolute_path),
-                f"assets/turbosquid_objects/{obj_name}/{obj_name}.xml",
+                f"assets/turbosquid_objects/{obj_name}/{base_name}.xml",
             ),
             name=name,
             joints=joints,
