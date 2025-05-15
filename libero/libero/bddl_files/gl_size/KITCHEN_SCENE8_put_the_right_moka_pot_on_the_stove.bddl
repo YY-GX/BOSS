@@ -13,7 +13,7 @@
             )
           )
       )
-      (larger_moka_pot_right_init_region
+      (smaller_moka_pot_right_init_region
           (:target kitchen_table)
           (:ranges (
               (-0.07500000000000001 0.225 -0.025 0.275)
@@ -24,7 +24,7 @@
             )
           )
       )
-      (larger_moka_pot_left_init_region
+      (smaller_moka_pot_left_init_region
           (:target kitchen_table)
           (:ranges (
               (0.025 0.025 0.07500000000000001 0.07500000000000001)
@@ -46,23 +46,23 @@
   )
 
   (:objects
-    larger_moka_pot_1 larger_moka_pot_2 - larger_moka_pot
+    smaller_moka_pot_1 smaller_moka_pot_2 - smaller_moka_pot
   )
 
   (:obj_of_interest
-    larger_moka_pot_1
+    smaller_moka_pot_1
     flat_stove_1
   )
 
   (:init
     (On flat_stove_1 kitchen_table_flat_stove_init_region)
-    (On larger_moka_pot_1 kitchen_table_larger_moka_pot_right_init_region)
-    (On larger_moka_pot_2 kitchen_table_larger_moka_pot_left_init_region)
+    (On smaller_moka_pot_1 kitchen_table_smaller_moka_pot_right_init_region)
+    (On smaller_moka_pot_2 kitchen_table_smaller_moka_pot_left_init_region)
     (Turnon flat_stove_1)
   )
 
   (:goal
-    (And (On larger_moka_pot_1 flat_stove_1_cook_region) (Turnon flat_stove_1))
+    (And (On smaller_moka_pot_1 flat_stove_1_cook_region) (Turnon flat_stove_1))
   )
 
 )
