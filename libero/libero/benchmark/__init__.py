@@ -406,6 +406,8 @@ selected_task_indexes = {
     "ch1_libero_local1": [1, 4],  # correspond to [2, \3, \4, \5, 9] - [2, 9]
     "ch1_libero_local2": [7, 10, 15, 16, 17, 18, 19, 20, 23, 39],  # 16 is wrong, it doesn't involve gripper closing thing -> KITCHEN_SCENE4_close_the_bottom_drawer_of_the_cabinet
     "ch1_libero_local3": [5, 24, 25, 29, 30, 32, 33, 37, 41, 43],
+    "gl_size": [i for i in range(0, 10)],
+    "gl_color": [i for i in range(0, 10)],
     # TODO
 }
 
