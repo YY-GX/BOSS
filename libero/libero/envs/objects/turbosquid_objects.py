@@ -207,3 +207,41 @@ class WhiteYellowMug(TurbosquidObjects):
     ):
         super().__init__(name, obj_name, joints)
         self.rotation = (-np.pi / 2, -np.pi / 2)
+
+
+# yy: For Local Generalize
+# scale: 1.5
+@register_object
+class LargerMokaPot(TurbosquidObjects):
+    def __init__(
+        self,
+        name="larger_moka_pot",
+        obj_name="larger_moka_pot",
+        joints=[dict(type="free", damping="0.0005")],
+    ):
+        super().__init__(name, obj_name, joints)
+
+# scale: 1.5
+@register_object
+class LargerRedCoffeeMug(TurbosquidObjects):
+    def __init__(
+        self,
+        name="larger_red_coffee_mug",
+        obj_name="larger_red_coffee_mug",
+        joints=[dict(type="free", damping="0.0005")],
+    ):
+        super().__init__(name, obj_name, joints)
+        self.rotation = (-np.pi / 2, -np.pi / 2)
+
+
+# scale: 0.75
+@register_object
+class SmallerPorcelainMug(TurbosquidObjects):
+    def __init__(
+        self,
+        name="smaller_porcelain_mug",
+        obj_name="smaller_porcelain_mug",
+        joints=[dict(type="free", damping="0.0005")],
+    ):
+        super().__init__(name, obj_name, joints)
+        self.rotation = (-np.pi / 2, -np.pi / 2)

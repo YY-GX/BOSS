@@ -259,3 +259,24 @@ class Potato(HopeBaseObject):
 #                  name="yogurt",
 #                  obj_name="yogurt"):
 #         super().__init__(name, obj_name)
+
+
+# yy: For Local Generalize
+# scale: 0.01 -> 0.015
+@register_object
+class LargerKetchup(HopeBaseObject):
+    def __init__(self, name="larger_ketchup", obj_name="larger_ketchup"):
+        super().__init__(name, obj_name)
+        self.rotation = {
+            "x": (np.pi / 2, np.pi / 2),
+            "z": (np.pi / 2, np.pi / 2),
+        }
+        self.rotation_axis = None
+
+# scale: 2
+@register_object
+class LargerChocolatePudding(HopeBaseObject):
+    def __init__(self, name="larger_chocolate_pudding", obj_name="larger_chocolate_pudding"):
+        super().__init__(name, obj_name)
+        self.rotation = (0.0, 0.0)
+        self.rotation_axis = "x"

@@ -86,3 +86,38 @@ class GlazedRimPorcelainRamekin(GoogleScannedObject):
         obj_name="glazed_rim_porcelain_ramekin",
     ):
         super().__init__(name, obj_name)
+
+
+
+# yy: For Local Generalize
+@register_object
+class AkitaGreenBowl(GoogleScannedObject):
+    def __init__(self, name="akita_green_bowl", obj_name="akita_green_bowl"):
+        super().__init__(name, obj_name)
+
+
+# scale: 0.7 -> 0.4
+@register_object
+class SmallerAkitaBlackBowl(GoogleScannedObject):
+    def __init__(self, name="smaller_akita_black_bowl", obj_name="smaller_akita_black_bowl"):
+        super().__init__(name, obj_name)
+
+
+# scale: 0.5 -> 0.75
+@register_object
+class LargerWhiteBowl(GoogleScannedObject):
+    def __init__(self, name="larger_white_bowl", obj_name="larger_white_bowl"):
+        super().__init__(name, obj_name)
+
+
+# scale: 0.75
+@register_object
+class SmallerChefmate8Frypan(GoogleScannedObject):
+    def __init__(self, name="smaller_chefmate_8_frypan", obj_name="smaller_chefmate_8_frypan"):
+        super().__init__(name, obj_name)
+
+# scale: 1.25
+@register_object
+class LargerChefmate8Frypan(GoogleScannedObject):
+    def __init__(self, name="larger_chefmate_8_frypan", obj_name="larger_chefmate_8_frypan"):
+        super().__init__(name, obj_name)
