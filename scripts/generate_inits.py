@@ -4,7 +4,7 @@ import os
 
 def create_init(bddl_file_name, suite_name):
     out_file = f"/mnt/arc/yygx/paper_codebases/RA-L_25/BOSS/libero/libero/init_files/{suite_name}"
-    os.makedirs(os.path.dirname(out_file), exist_ok=True)
+    os.makedirs(out_file, exist_ok=True)
     config_dict = {
         ".init": 50,
         ".pruned_init": 20,
