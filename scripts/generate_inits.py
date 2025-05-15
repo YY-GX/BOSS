@@ -3,14 +3,14 @@ from libero.libero.envs import OffScreenRenderEnv
 import os
 
 def create_init(bddl_file_name, suite_name):
-    out_file = f"/mnt/arc/yygx/paper_codebases/RA-L_25/BOSS/libero/libero/init_files/{suite_name}"
-    os.makedirs(out_file, exist_ok=True)
+    out_folder = f"/mnt/arc/yygx/paper_codebases/RA-L_25/BOSS/libero/libero/init_files/{suite_name}"
+    os.makedirs(out_folder, exist_ok=True)
     config_dict = {
         ".init": 50,
         ".pruned_init": 20,
     }
     for suffix, N in config_dict.items():
-        out_file = os.path.join(out_file, bddl_file_name.split(suite_name)[-1].replace(".bddl", suffix).lstrip('/'))
+        out_file = os.path.join(out_folder, bddl_file_name.split(suite_name)[-1].replace(".bddl", suffix).lstrip('/'))
         env_args = {
                     "bddl_file_name": bddl_file_name,
                     "camera_heights": 128,
