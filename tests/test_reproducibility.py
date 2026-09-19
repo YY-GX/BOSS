@@ -216,3 +216,14 @@ def test_no_unguarded_wandb_calls():
 
         Visitor().visit(tree)
     assert not offenders, "wandb calls not guarded by cfg.use_wandb: " + ", ".join(offenders)
+
+
+def test_setup_py_actually_finds_the_packages():
+    """Without libero/__init__.py, find_packages() returns nothing and
+    `pip install -e .` installs an empty distribution."""
+    from setuptools import find_packages
+
+    packages = [p for p in find_packages(where=REPO_ROOT) if p.startswith("libero")]
+    assert "libero" in packages, f"top-level libero package not found: {packages}"
+    for expected in ["libero.libero", "libero.lifelong", "libero.libero.benchmark"]:
+        assert expected in packages, f"{expected} missing from {packages}"
