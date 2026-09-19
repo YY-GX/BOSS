@@ -96,8 +96,12 @@ The adapter is written to
 
 ## Challenges
 
-`MODEL=./experiments/boss_44/0.0.0/BCTransformerPolicy_seed10000/run_001/` in the
-examples below; substitute the policy and seed you want to evaluate.
+The examples below evaluate one checkpoint folder; substitute the policy and seed
+you want.
+
+```shell
+export MODEL=./experiments/boss_44/0.0.0/BCTransformerPolicy_seed10000/run_001/
+```
 
 ### BOSS-C1: Single Predicate Shift
 
@@ -219,6 +223,15 @@ loadable.
   not part of the published results.
 - `openvla/` vendors a fork of the OpenVLA repository; the shell scripts under
   `openvla/shells/` still contain absolute paths that need editing.
+
+## Tests
+
+```shell
+pytest tests/
+```
+
+A small regression suite covering the seeding, path-resolution and dataset-prep
+fixes. It runs in about 30 seconds and needs neither assets nor checkpoints.
 
 ## Citation
 
