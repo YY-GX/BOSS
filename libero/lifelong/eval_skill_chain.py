@@ -14,6 +14,7 @@ from libero.lifelong.metric import (
     raw_obs_to_tensor_obs,
 )
 from libero.lifelong.utils import (
+    control_seed,
     safe_device,
     torch_load_model,
 )
@@ -35,6 +36,13 @@ def parse_args():
                         default="./experiments/boss_44/0.0.0/BCTransformerPolicy_seed10000/run_001/", required=True)
     parser.add_argument("--seed", type=int, required=True, default=10000)
     parser.add_argument("--device_id", type=int, default=0)
+    parser.add_argument(
+        "--lht",
+        type=int,
+        nargs="+",
+        default=list(range(1, 11)),
+        help="Which BOSS-CH3 long-horizon tasks to evaluate (1-10). Defaults to all.",
+    )
     args = parser.parse_args()
     args.device_id = "cuda:" + str(args.device_id)
     return args
@@ -70,8 +78,12 @@ def reset_env_init_states(env, obs, info, init_states_ls, env_num, task_indexes)
 def main():
     args = parse_args()
 
-    # Loop 10 long horizon tasks
-    for lht_idx in range(1, 11):
+    # The GMM policy head samples actions, so evaluation is stochastic. Seed torch
+    # (and numpy/random) here or repeated runs of the same command disagree.
+    control_seed(args.seed)
+
+    # Loop over the selected long horizon tasks
+    for lht_idx in args.lht:
         lht_name = f"ch3_{lht_idx}"
 
         """

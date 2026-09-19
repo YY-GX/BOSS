@@ -56,12 +56,11 @@ def torch_save_model(model, model_path, cfg=None, previous_masks=None):
 
 
 def torch_load_model(model_path, map_location=None):
-    model_dict = torch.load(model_path, map_location=map_location)
-    cfg = None
-    if "cfg" in model_dict:
-        cfg = model_dict["cfg"]
-    if "previous_masks" in model_dict:
-        previous_masks = model_dict["previous_masks"]
+    # weights_only defaults to True from PyTorch 2.6; our checkpoints also carry
+    # the EasyDict training config, which that mode refuses to unpickle.
+    model_dict = torch.load(model_path, map_location=map_location, weights_only=False)
+    cfg = model_dict.get("cfg", None)
+    previous_masks = model_dict.get("previous_masks", None)
     return model_dict["state_dict"], cfg, previous_masks
 
 
@@ -107,17 +106,11 @@ def compute_flops(algo, dataset, cfg):
 
 
 def create_experiment_dir(cfg, version=None):
-    prefix = "./experiments"
-    if version:
-        experiment_dir = (
-                f"./{prefix}/{cfg.benchmark_name}/{version}/"
-                + f"{cfg.policy.policy_type}_seed{cfg.seed}"
-        )
-    else:
-        experiment_dir = (
-            f"./{prefix}/{cfg.benchmark_name}/0.0.0/"
-            + f"{cfg.policy.policy_type}_seed{cfg.seed}"
-        )
+    # Relative to the working directory: run training from the repository root.
+    experiment_dir = (
+        f"./experiments/{cfg.benchmark_name}/{version or '0.0.0'}/"
+        + f"{cfg.policy.policy_type}_seed{cfg.seed}"
+    )
 
     if not os.path.exists(experiment_dir):
         os.makedirs(experiment_dir)

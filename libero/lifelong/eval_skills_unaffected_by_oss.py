@@ -1,4 +1,5 @@
 import argparse
+import json
 import sys
 import os
 
@@ -14,6 +15,7 @@ from libero.lifelong.metric import (
     raw_obs_to_tensor_obs,
 )
 from libero.lifelong.utils import (
+    control_seed,
     safe_device,
     torch_load_model,
 )
@@ -38,7 +40,12 @@ def parse_args():
     )
     parser.add_argument("--seed", type=int, required=True, default=10000)
     parser.add_argument("--device_id", type=int, default=0)
-    parser.add_argument("--is_debug", type=int, default=1)
+    parser.add_argument(
+        "--is_debug",
+        type=int,
+        default=0,
+        help="1 = smoke test on a single task only. Reported numbers require 0.",
+    )
     args = parser.parse_args()
     args.device_id = "cuda:" + str(args.device_id)
     return args
@@ -46,9 +53,17 @@ def parse_args():
 
 def main():
     args = parse_args()
+
+    # The GMM policy head samples actions, so evaluation is stochastic. Seed torch
+    # (and numpy/random) here or repeated runs of the same command disagree.
+    control_seed(args.seed)
     
     # Get the benchmarks
     if args.is_debug:
+        print(
+            "[WARNING] --is_debug=1: evaluating ONE task only. "
+            "Use --is_debug 0 for the full benchmark."
+        )
         benchmark = get_benchmark(args.benchmark)(n_tasks=1)
     else:
         benchmark = get_benchmark(args.benchmark)()
@@ -63,6 +78,7 @@ def main():
 
     succ_list = []
     eval_task_id = []
+    succ_per_task = {}
     for idx, task_id in enumerate(task_id_ls):  # task_id is the actual id of the task. idx is just the index.
         print(f">> Evaluate on original Task {task_id}")
         # Obtain useful info from saved model - checkpoints / cfg
@@ -183,6 +199,7 @@ def main():
             }
 
             succ_list.append(success_rate)
+            succ_per_task[int(task_id)] = success_rate
             torch.save(eval_stats, save_stats_pth)
             with open(os.path.join(args.model_path_folder, f"eval_tasks_on_ori_envs_seed{args.seed}", f"succ_list_evaluation_on_ori_envs.npy"), 'wb') as f:
                 np.save(f, np.array(succ_list))
@@ -197,6 +214,12 @@ def main():
         eval_task_id.append(task_id)
 
     print(f"[INFO] Finish evaluating original env list: {eval_task_id}")
+    succ_json_pth = os.path.join(
+        args.model_path_folder, f"eval_tasks_on_ori_envs_seed{args.seed}", "succ_per_task_on_ori_envs.json"
+    )
+    with open(succ_json_pth, "w") as f:
+        json.dump(succ_per_task, f, indent=2, sort_keys=True)
+    print(f"[INFO] Per-task success rates saved to {succ_json_pth}")
 
 if __name__ == "__main__":
     main()
