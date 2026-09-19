@@ -316,7 +316,14 @@ class SequentialEnv(OffScreenRenderEnv):
         self.env_ls[0].reset()
 
     def seed(self, seed):
-        seed = np.random.seed(seed)
+        """Seed this env chain and every sub-environment.
+
+        ``np.random.seed`` returns ``None``, so assigning its result back to
+        ``seed`` used to forward ``None`` to each sub-environment, whose own
+        ``seed`` calls ``np.random.seed(None)`` -- re-seeding the global RNG
+        from OS entropy and destroying the determinism just established.
+        """
+        np.random.seed(seed)
         for env in self.env_ls:
             env.seed(seed)
 
