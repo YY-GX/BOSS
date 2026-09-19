@@ -10,37 +10,34 @@ defaults:
   - test: null
 
 seed: 10000
-use_wandb: true
+
+use_wandb: false
 wandb_project: "BOSS Training & Evaluation"
-folder: "./libero/datasets/"
-bddl_folder: "./libero/libero/bddl_files"
-init_states_folder: "./libero/libero/init_files"
-device: "cuda:7"
+
+# Leave these null to resolve them from .boss/config.yaml (recommended: they are
+# then anchored on this checkout). Set them to override for one run.
+folder: null              # datasets
+bddl_folder: null         # bddl_files
+init_states_folder: null  # init_files
+
+device: "cuda:0"
 task_embedding_format: "bert"
 task_embedding_one_hot_offset: 1
 pretrain: false
 pretrain_model_path: ""
 benchmark_name: "boss_44"
-#version: "0.0.0"
-version: "history_length"
+
+# Names the experiment folder: experiments/<benchmark_name>/<version>/<policy>_seed<seed>/run_XXX
+version: "0.0.0"
 task_num_to_use: null
 
-# BL3 related parameters
-
-#bl3_folder: "bl3"
-#bl3_mapping: "bl3.json"
-#only_success: false
-#ratio: 1.0
-
-#bl3_folder: "bl3_seed10000"
-#bl3_mapping: "bl3_seed10000.json"
-#only_success: true
-#ratio: 1.0
-
-bl3_folder: "bl3_all"
-bl3_mapping: "bl3_all.json"
-only_success: true
-ratio: 1.0
+# --- RAMG-augmented training (paper Table I, Setup B) ---
+# Used only by train_skills_augmented.py. `augmentation_folder` is a sub-folder of
+# the dataset folder holding the generated demos; `augmentation_mapping` is the
+# json in libero/mappings/ listing the modified tasks per original task.
+augmentation_folder: "data_augmentation"
+augmentation_mapping: "data_augmentation.json"
+augmentation_only_success: true
+augmentation_ratio: 1.0
 
 is_debug: false
-

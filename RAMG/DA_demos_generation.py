@@ -1,4 +1,6 @@
+import argparse
 import os
+import sys
 import time
 
 from libero.libero.envs import OffScreenRenderEnv
@@ -16,46 +18,50 @@ import subprocess
 import robosuite.macros as macros
 import robosuite.utils.transform_utils as T
 import libero.libero.utils.utils as libero_utils
-from libero.libero.benchmark import get_benchmark, task_orders
+from libero.libero import get_libero_path
+from libero.libero.benchmark import MAPPINGS_FOLDER, get_benchmark
 from pathlib import Path
+
+_REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
+
 
 class CreateDemos:
     def __init__(
             self,
             benchmark,
             is_render=False,
-            img_size=128
+            img_size=128,
+            start_index=0,
     ):
         self.benchmark = benchmark
         self.is_render = is_render
         self.img_size = img_size
-        self.ori_demos_folder = "libero/datasets/boss_44/"
-        self.ori_bddl_folder = f"libero/libero/bddl_files/boss_44/"
-        self.modified_bddl_folder = f"libero/libero/bddl_files/{self.benchmark}/"
-        self.task_order_index = 0
 
-        benchmark = get_benchmark("boss_44")(task_order_index=self.task_order_index)
-        self.ori_task_names = benchmark.get_task_names()
-        # self.ori_task_names = [bddl_name.split('.')[0] for bddl_name in os.listdir(self.ori_bddl_folder)]
+        datasets_folder = get_libero_path("datasets")
+        bddl_folder = get_libero_path("bddl_files")
+        self.ori_demos_folder = os.path.join(datasets_folder, "boss_44")
+        self.ori_bddl_folder = os.path.join(bddl_folder, "boss_44")
+        self.modified_bddl_folder = os.path.join(bddl_folder, self.benchmark)
+
+        self.ori_task_names = get_benchmark("boss_44")().get_task_names()
         self.demos_pths = sorted([os.path.join(self.ori_demos_folder, task_name + "_demo.hdf5") for task_name in
                            self.ori_task_names])
 
-        self.dataset_path = f"libero/datasets/{self.benchmark}"
+        self.dataset_path = os.path.join(datasets_folder, self.benchmark)
         Path(self.dataset_path).mkdir(parents=True, exist_ok=True)
 
-        self.start_demos_generation()
+        self.start_demos_generation(start_index=start_index)
 
-    def start_demos_generation(self, num_task_to_process=1000000):  # 1000000 means no limitation
+    def start_demos_generation(self, start_index=0, num_task_to_process=1000000):
         # Create new demos based on: 1. ori demo 2. modified bddl
-        mapping_pth = f"libero/mappings/{self.benchmark}.json"
+        mapping_pth = os.path.join(MAPPINGS_FOLDER, f"{self.benchmark}.json")
         with open(mapping_pth, 'r') as json_file:
             mapping = json.load(json_file)
         self.ori_task_names = sorted(self.ori_task_names)
         print(f"Original task names: {self.ori_task_names}")
         # For each boss_44 task, obtain the modified version of dataset from it.
         for i, task_name in enumerate(self.ori_task_names[:num_task_to_process]):
-            # I added this here
-            if i < 5:
+            if i < start_index:  # for resuming an interrupted run
                 continue
 
             print(f"===================================================================================================")
@@ -85,7 +91,7 @@ class CreateDemos:
         """
 
         cmd = [
-            "python", "scripts/DemoProcessor.py",
+            sys.executable, os.path.join(_REPO_ROOT, "scripts", "DemoProcessor.py"),
             "--use-camera-obs",
             "--dataset_path",
             dst_demo_path,
@@ -108,4 +114,11 @@ class CreateDemos:
 
 
 if __name__ == '__main__':
-    create_demos = CreateDemos(benchmark="data_augmentation", is_render=False)
+    parser = argparse.ArgumentParser(description="Generate RAMG-augmented demos from boss_44.")
+    parser.add_argument("--benchmark", default="data_augmentation")
+    parser.add_argument("--start-index", type=int, default=0,
+                        help="Skip the first N boss_44 tasks (to resume an interrupted run).")
+    cli_args = parser.parse_args()
+    create_demos = CreateDemos(
+        benchmark=cli_args.benchmark, is_render=False, start_index=cli_args.start_index
+    )

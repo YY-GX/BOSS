@@ -669,9 +669,6 @@ class InSiteRegionRandomSampler(SiteRegionRandomSampler):
                     break
 
             if not success:
-                import pdb
-
-                pdb.set_trace()
                 raise RandomizationError("Cannot place all objects ):")
 
         return placed_objects

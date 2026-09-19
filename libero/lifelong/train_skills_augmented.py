@@ -14,7 +14,7 @@ import h5py
 from easydict import EasyDict
 from omegaconf import OmegaConf
 from libero.libero import get_libero_path
-from libero.libero.benchmark import get_benchmark
+from libero.libero.benchmark import MAPPINGS_FOLDER, get_benchmark
 from libero.lifelong.policy_starter import PolicyStarter
 from libero.lifelong.models import get_policy_list
 from libero.lifelong.datasets import GroupedTaskDataset, SequenceVLDataset, get_dataset, get_combined_dataset
@@ -57,7 +57,7 @@ def main(hydra_cfg):
     """
     Prepare datasets - demos + language embeddings
     """
-    benchmark = get_benchmark(cfg.benchmark_name)(cfg.data.task_order_index, n_tasks_=cfg.task_num_to_use)
+    benchmark = get_benchmark(cfg.benchmark_name)(n_tasks=cfg.task_num_to_use)
     n_manip_tasks = benchmark.n_tasks
 
     # prepare datasets from the benchmark
@@ -71,8 +71,8 @@ def main(hydra_cfg):
     for i in range(n_manip_tasks):
         # currently we assume tasks from same benchmark have the same shape_meta
         try:
-            # BL3 dataset
-            mapping_pth = f"libero/mappings/{cfg.bl3_mapping}"
+            # RAMG-augmented demos for this task, combined with the original demo
+            mapping_pth = os.path.join(MAPPINGS_FOLDER, cfg.augmentation_mapping)
             with open(mapping_pth, 'r') as json_file:
                 mapping = json.load(json_file)
             task_name = benchmark.get_task_demonstration(i).split("/")[-1][:-10]
@@ -80,21 +80,21 @@ def main(hydra_cfg):
             dataset_pth_ls = []
             succ_dict_pth_ls = []
             for modified_task_idx in range(num_modified_task):
-                bl3_dataset_pth = os.path.join(cfg.folder, cfg.bl3_folder,
+                aug_dataset_pth = os.path.join(cfg.folder, cfg.augmentation_folder,
                                                task_name + f"_{modified_task_idx}_demo.hdf5")
-                dataset_pth_ls.append(bl3_dataset_pth)
-                bl3_success_dict_pth = os.path.join(cfg.folder, cfg.bl3_folder,
+                dataset_pth_ls.append(aug_dataset_pth)
+                aug_success_dict_pth = os.path.join(cfg.folder, cfg.augmentation_folder,
                                                task_name + f"_{modified_task_idx}_demo.pkl")
-                succ_dict_pth_ls.append(bl3_success_dict_pth)
+                succ_dict_pth_ls.append(aug_success_dict_pth)
 
             # Create Combined Dataset
             dataset_pth_ls.append(os.path.join(cfg.folder, benchmark.get_task_demonstration(i)))
-            ratios_ls = [cfg.ratio for _ in range(num_modified_task)] + [1.0]
+            ratios_ls = [cfg.augmentation_ratio for _ in range(num_modified_task)] + [1.0]
             task_i_dataset, shape_meta_list = get_combined_dataset(
                 dataset_path_ls=dataset_pth_ls,
                 obs_modality=cfg.data.obs.modality,
                 ratios_ls=ratios_ls,
-                only_success=cfg.only_success,
+                only_success=cfg.augmentation_only_success,
                 succ_dict_path_ls=succ_dict_pth_ls,
                 initialize_obs_utils=True,
                 seq_len=cfg.data.seq_len,
@@ -140,7 +140,7 @@ def main(hydra_cfg):
     Start training
     """
     # prepare experiment and update the config
-    create_experiment_dir(cfg, version=cfg.bl3_folder)
+    create_experiment_dir(cfg, version=cfg.augmentation_folder)
     cfg.shape_meta = shape_meta
     if cfg.use_wandb:
         wandb.init(project="libero", config=cfg)
