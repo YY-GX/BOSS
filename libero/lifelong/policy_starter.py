@@ -143,7 +143,8 @@ class PolicyStarter(nn.Module):
             print(
                 f"[info] Epoch: {epoch:3d} | train loss: {training_loss:5.2f} | time: {(t1-t0)/60:4.2f}"
             )
-            wandb.log({f"task{task_id}/train_loss": training_loss, "epoch": epoch})
+            if self.cfg.use_wandb:
+                wandb.log({f"task{task_id}/train_loss": training_loss, "epoch": epoch})
 
             if epoch % self.cfg.eval.eval_every == 0:
                 t0 = time.time()
@@ -156,7 +157,8 @@ class PolicyStarter(nn.Module):
                 print(
                     f"[info] Epoch: {epoch:3d} | eval loss: {training_loss:5.2f} | time: {(t1 - t0) / 60:4.2f}"
                 )
-                wandb.log({f"task{task_id}/eval_loss": L, "epoch": epoch})
+                if self.cfg.use_wandb:
+                    wandb.log({f"task{task_id}/eval_loss": L, "epoch": epoch})
 
             if self.scheduler is not None and epoch > 0:
                 self.scheduler.step()

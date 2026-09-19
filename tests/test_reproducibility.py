@@ -8,6 +8,7 @@ so they run in a couple of seconds and are safe to put in CI.
 
 import ast
 import os
+import pathlib
 import re
 
 import numpy as np
@@ -187,3 +188,31 @@ def test_chain_eval_collects_every_sub_task_config():
                     f"{inner.func.value.id}.append is inside a conditional; the skill chain "
                     f"would silently lose sub-tasks"
                 )
+
+
+def test_no_unguarded_wandb_calls():
+    """use_wandb=false must not crash training: wandb.log needs wandb.init first."""
+    offenders = []
+    for path in sorted((pathlib.Path(REPO_ROOT) / "libero" / "lifelong").rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+
+        class Visitor(ast.NodeVisitor):
+            def __init__(self):
+                self.guards = []
+
+            def visit_If(self, node):
+                self.guards.append(ast.dump(node.test))
+                self.generic_visit(node)
+                self.guards.pop()
+
+            def visit_Call(self, node):
+                root = node.func
+                while isinstance(root, ast.Attribute):
+                    root = root.value
+                if (isinstance(root, ast.Name) and root.id == "wandb"
+                        and not any("use_wandb" in g for g in self.guards)):
+                    offenders.append(f"{path.relative_to(REPO_ROOT)}:{node.lineno}")
+                self.generic_visit(node)
+
+        Visitor().visit(tree)
+    assert not offenders, "wandb calls not guarded by cfg.use_wandb: " + ", ".join(offenders)

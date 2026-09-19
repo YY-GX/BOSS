@@ -188,7 +188,8 @@ def main(hydra_cfg):
                 video_folder=os.path.join(cfg.experiment_dir, f"task{i}_videos")
             )
             print(f">> Success Rate: {S[0]}")
-            wandb.log({f"task{i}/success_rate": S[0], "epoch": 0})
+            if cfg.use_wandb:
+                wandb.log({f"task{i}/success_rate": S[0], "epoch": 0})
             succ_list.append(S[0])
             with open(os.path.join(cfg.experiment_dir, f"succ_list.npy"), 'wb') as f:
                 np.save(f, np.array(succ_list))
