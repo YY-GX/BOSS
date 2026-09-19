@@ -55,8 +55,17 @@ somewhere else. Run all commands below **from the repository root**.
 
 ## Data setup
 
-Download [LIBERO-90](https://utexas.box.com/shared/static/cv73j8zschq8auh9npzt876fdc1akvmk.zip)
-and unpack it into `libero/datasets/`, then reduce it to the 44 single-skill tasks:
+Download the LIBERO-90 demonstrations into `libero/datasets/libero_90/`. LIBERO's
+original utexas.box.com links now return 403, so use the HuggingFace mirror:
+
+```shell
+pip install huggingface_hub
+huggingface-cli download yifengzhu-hf/LIBERO-datasets \
+  --repo-type dataset --include "libero_90/*" \
+  --local-dir libero/datasets
+```
+
+Then reduce it to the 44 single-skill tasks:
 
 ```shell
 python scripts/form_boss_44_dataset.py
