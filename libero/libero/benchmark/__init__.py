@@ -9,6 +9,12 @@ from typing import List, NamedTuple, Type
 from libero.libero import get_libero_path
 from libero.libero.benchmark.boss_task_map import boss_task_map
 
+# <repo>/libero/mappings, resolved relative to this file so that the benchmark
+# can be imported from any working directory and from any checkout.
+MAPPINGS_FOLDER = os.path.abspath(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir, "mappings")
+)
+
 """
 Create global vars
 """
@@ -316,9 +322,8 @@ for boss_suite in boss_suites:
             language = grab_language_from_filename(task + ".bddl", is_modified=False)
         else:
             # use original task's language
-            # mapping_pth = f"./libero/mappings/{boss_suite}.json"
-            mapping_pth = f"/mnt/arc/yygx/paper_codebases/RA-L_25/BOSS/libero/mappings/{boss_suite}.json"
-            with open(mapping_pth, 'r') as json_file:
+            mapping_pth = os.path.join(MAPPINGS_FOLDER, f"{boss_suite}.json")
+            with open(mapping_pth, "r") as json_file:
                 mapping = json.load(json_file)
             task_ori = find_keys_by_value(mapping, task + ".bddl")[0]
             language = grab_language_from_filename(task_ori + ".bddl", is_modified=True)

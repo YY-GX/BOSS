@@ -5,18 +5,22 @@ from pathlib import Path
 import numpy as np
 
 import libero.libero.envs.bddl_utils as BDDLUtils
+from libero.libero import get_libero_path
 
 from scale_up_bddl_generation import bddl_dict2file
 from scale_up_bddl_modification import modify_environment, open_regions_for_each_scene
 
 # ================ Params ================
-seed_ls = [10001] # [10000, 10001, 10002]
+# Seeds used to sample modifications. Re-running this script overwrites the
+# bddl_files/data_augmentation/ folder that ships with the repo.
+seed_ls = [10001]
 num_diff_combination = 20
 combination_list = [40, 39, 38, 38, 37, 38, 52, 51, 51, 51, 52, 51, 51, 18, 18, 30, 51, 49, 50, 49, 38, 45, 44, 44, 45,
                     44, 50, 43, 40, 29, 11, 24, 54, 54, 54, 54, 69, 23, 23, 23, 24, 30, 43, 43]
-bddl_folder_single_step = "libero/libero/bddl_files/ch1/"
-bddl_folder_boss_44 = "libero/libero/bddl_files/boss_44/"
-dst_bddl_folder = "libero/libero/bddl_files/"
+_BDDL_ROOT = get_libero_path("bddl_files")
+bddl_folder_single_step = os.path.join(_BDDL_ROOT, "ch1")
+bddl_folder_boss_44 = os.path.join(_BDDL_ROOT, "boss_44")
+dst_bddl_folder = _BDDL_ROOT
 # ================ Params ================
 
 

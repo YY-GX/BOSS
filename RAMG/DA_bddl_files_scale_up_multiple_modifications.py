@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 
 import libero.libero.envs.bddl_utils as BDDLUtils
+from libero.libero import get_libero_path
 
 from scale_up_bddl_generation import bddl_dict2file
 from scale_up_bddl_modification import modify_environment, open_regions_for_each_scene
@@ -12,15 +13,17 @@ from robosuite.utils.errors import RandomizationError
 from libero.libero.envs import OffScreenRenderEnv
 
 # ================ Params ================
-seed_ls = [10001] # [10000, 10001, 10002]
+# Seeds used to sample modifications. Re-running this script overwrites the
+# bddl_files/data_augmentation/ folder that ships with the repo.
+seed_ls = [10001]
 num_diff_combination = 20
-# if u only want to generate 1 modified bddl file with ADDITIONAL_NUM modifications
-combination_list = [1 for _ in range(44)]
-# Define ur own combination_list, each number is the number of modified bddl files to be generated for each bddl file
+# How many modified bddl files to generate per boss_44 task.
+# Use [1] * 44 to emit a single file per task with ADDITIONAL_NUM modifications.
 combination_list = [50 for _ in range(44)]
-bddl_folder_single_step = "libero/libero/bddl_files/ch1/"
-bddl_folder_boss_44 = "libero/libero/bddl_files/boss_44/"
-dst_bddl_folder = "libero/libero/bddl_files/"
+_BDDL_ROOT = get_libero_path("bddl_files")
+bddl_folder_single_step = os.path.join(_BDDL_ROOT, "ch1")
+bddl_folder_boss_44 = os.path.join(_BDDL_ROOT, "boss_44")
+dst_bddl_folder = _BDDL_ROOT
 ADDITIONAL_NUM = 2
 # ================ Params ================
 

@@ -30,3 +30,13 @@ openvla/datasets/*
 # Allow tracking experiments under openvla
 !openvla/experiments/
 !openvla/prismatic/vla/datasets/
+
+# Machine-local path config, generated on first import (absolute paths)
+.boss/
+# IDE
+.idea/
+# Downloaded / generated at the repo root (may be a symlink, hence anchored)
+/experiments
+/bert
+/libero/libero/assets
+/libero/datasets

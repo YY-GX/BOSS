@@ -1,98 +1,77 @@
+"""Path resolution for the BOSS benchmark assets, datasets and task files.
+
+Paths live in ``<repo>/.boss/config.yaml``, which is generated on first import
+and is deliberately *not* tracked by git: it holds absolute paths that are only
+valid on the machine that created it. Set ``BOSS_CONFIG_PATH`` to keep it
+elsewhere.
+"""
+
 import os
+
 import yaml
 
-# This is a default path for localizing all the benchmark related files
-boss_config_path = os.environ.get(
-    "BOSS_CONFIG_PATH", os.path.expanduser("./.boss")
-)
+# <repo>/libero/libero -- everything else is resolved relative to this, so the
+# package works from any working directory and from any checkout.
+_PACKAGE_ROOT = os.path.dirname(os.path.abspath(__file__))
+_REPO_ROOT = os.path.abspath(os.path.join(_PACKAGE_ROOT, os.pardir, os.pardir))
+
+boss_config_path = os.environ.get("BOSS_CONFIG_PATH", os.path.join(_REPO_ROOT, ".boss"))
 config_file = os.path.join(boss_config_path, "config.yaml")
+
+_warned_missing = set()
 
 
 def get_default_path_dict(custom_location=None):
-    if custom_location is None:
-        benchmark_root_path = os.path.dirname(os.path.abspath(__file__))
-    else:
-        benchmark_root_path = custom_location
-
-    # This is a default path for localizing all the default bddl files
-    bddl_files_default_path = os.path.join(benchmark_root_path, "./bddl_files")
-
-    # This is a default path for localizing all the default bddl files
-    init_states_default_path = os.path.join(benchmark_root_path, "./init_files")
-
-    # This is a default path for localizing all the default datasets
-    dataset_default_path = os.path.join(benchmark_root_path, "../datasets")
-
-    # This is a default path for localizing all the default assets
-    assets_default_path = os.path.join(benchmark_root_path, "./assets")
-
+    benchmark_root_path = _PACKAGE_ROOT if custom_location is None else custom_location
     return {
         "benchmark_root": benchmark_root_path,
-        "bddl_files": bddl_files_default_path,
-        "init_states": init_states_default_path,
-        "datasets": dataset_default_path,
-        "assets": assets_default_path,
+        "bddl_files": os.path.join(benchmark_root_path, "bddl_files"),
+        "init_states": os.path.join(benchmark_root_path, "init_files"),
+        "datasets": os.path.join(os.path.dirname(benchmark_root_path), "datasets"),
+        "assets": os.path.join(benchmark_root_path, "assets"),
     }
 
 
+def _write_config(path_dict):
+    os.makedirs(boss_config_path, exist_ok=True)
+    with open(config_file, "w") as f:
+        yaml.safe_dump(path_dict, f, default_flow_style=False)
+    return path_dict
+
+
+def _load_config():
+    """Return the path config, regenerating it if it belongs to another checkout."""
+    if os.path.exists(config_file):
+        with open(config_file, "r") as f:
+            config = yaml.safe_load(f) or {}
+        if config.get("benchmark_root") == _PACKAGE_ROOT:
+            return config
+        print(
+            f"[BOSS] {config_file} points at {config.get('benchmark_root')!r}, "
+            f"but this checkout lives at {_PACKAGE_ROOT!r}. Regenerating it."
+        )
+    else:
+        print(f"[BOSS] Creating path config at {config_file}")
+    return _write_config(get_default_path_dict())
+
+
 def get_libero_path(query_key):
-    with open(config_file, "r") as f:
-        config = dict(yaml.load(f.read(), Loader=yaml.FullLoader))
-
-    # Give warnings in case the user needs to access the paths
-    for key in config:
-        if not os.path.exists(config[key]):
-            print(f"[Warning]: {key} path {config[key]} does not exist!")
-
-    assert (
-        query_key in config
-    ), f"Key {query_key} not found in config file {config_file}. You need to modify it. Available keys are: {config.keys()}"
-    return config[query_key]
-
-
-def set_libero_default_path(custom_location=os.path.dirname(os.path.abspath(__file__))):
-    print(
-        f"[Warning] You are changing the default path for Libero config. This will affect all the paths in the config file."
+    config = _load_config()
+    assert query_key in config, (
+        f"Key {query_key} not found in config file {config_file}. "
+        f"Available keys are: {list(config)}"
     )
-    new_config = get_default_path_dict(custom_location)
-    with open(config_file, "w") as f:
-        yaml.dump(new_config, f)
+    path = config[query_key]
+    if not os.path.exists(path) and query_key not in _warned_missing:
+        _warned_missing.add(query_key)
+        print(f"[BOSS][Warning] {query_key} path {path} does not exist!")
+    return path
 
 
-if not os.path.exists(boss_config_path):
-    os.makedirs(boss_config_path)
+def set_libero_default_path(custom_location=_PACKAGE_ROOT):
+    """Re-point every path at ``custom_location`` and persist the result."""
+    print(f"[BOSS] Rewriting {config_file} to use benchmark root {custom_location}")
+    return _write_config(get_default_path_dict(custom_location))
 
-if not os.path.exists(config_file):
-    # Create a default config file
 
-    default_path_dict = get_default_path_dict()
-    # answer = input(
-    #     "Do you want to specify a custom path for the dataset folder? (Y/N): "
-    # ).lower()
-    # all no for this answer
-    answer = "n"
-    if answer == "y":
-        # If the user wants to specify a custom storage path, prompt them to enter it
-        custom_dataset_path = input(
-            "Enter the path where you want to store the datasets: "
-        )
-        full_custom_dataset_path = os.path.join(
-            os.path.abspath(os.path.expanduser(custom_dataset_path)), "datasets"
-        )
-        # Check if the custom storage path exists, and create if it doesn't
-
-        print("The full path of the custom storage path you entered is:")
-        print(full_custom_dataset_path)
-        print("Do you want to continue? (Y/N)")
-        confirm_answer = input().lower()
-        if confirm_answer == "y":
-            if not os.path.exists(full_custom_dataset_path):
-                os.makedirs(full_custom_dataset_path)
-            default_path_dict["datasets"] = full_custom_dataset_path
-    print("Initializing the default config file...")
-    print(f"The following information is stored in the config file: {config_file}")
-    # write all the paths into a yaml file
-    with open(config_file, "w") as f:
-        yaml.dump(default_path_dict, f)
-    for key, value in default_path_dict.items():
-        print(f"{key}: {value}")
+_load_config()
