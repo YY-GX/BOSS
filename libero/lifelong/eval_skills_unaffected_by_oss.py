@@ -46,6 +46,12 @@ def parse_args():
         default=0,
         help="1 = smoke test on a single task only. Reported numbers require 0.",
     )
+    parser.add_argument(
+        "--max_steps",
+        type=int,
+        default=None,
+        help="Override cfg.eval.max_steps from the checkpoint (paper-era boss_44 configs used 400).",
+    )
     args = parser.parse_args()
     args.device_id = "cuda:" + str(args.device_id)
     return args
@@ -99,6 +105,8 @@ def main():
         cfg.bddl_folder = get_libero_path("bddl_files")
         cfg.init_states_folder = get_libero_path("init_states")
         cfg.device = args.device_id
+        if args.max_steps is not None:
+            cfg.eval.max_steps = args.max_steps
         save_dir = os.path.join(args.model_path_folder, f"eval_tasks_on_ori_envs_seed{args.seed}", f"evaluation_task{task_id}_on_ori_envs")
         print(f">> Create folder {save_dir}")
         os.system(f"mkdir -p {save_dir}")

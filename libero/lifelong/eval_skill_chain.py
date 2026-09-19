@@ -43,6 +43,12 @@ def parse_args():
         default=list(range(1, 11)),
         help="Which BOSS-CH3 long-horizon tasks to evaluate (1-10). Defaults to all.",
     )
+    parser.add_argument(
+        "--max_steps",
+        type=int,
+        default=None,
+        help="Override cfg.eval.max_steps from the checkpoint (paper-era boss_44 configs used 400).",
+    )
     args = parser.parse_args()
     args.device_id = "cuda:" + str(args.device_id)
     return args
@@ -129,6 +135,8 @@ def main():
             cfg.bddl_folder = get_libero_path("bddl_files")
             cfg.init_states_folder = get_libero_path("init_states")
             cfg.device = args.device_id
+            if args.max_steps is not None:
+                cfg.eval.max_steps = args.max_steps
             # cfg_ls here
             cfg_ls.append(cfg)
 

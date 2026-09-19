@@ -6,6 +6,7 @@ so they run in a couple of seconds and are safe to put in CI.
     pytest tests/
 """
 
+import ast
 import os
 import re
 
@@ -76,18 +77,21 @@ def test_mappings_folder_is_inside_this_checkout():
 
 
 def test_no_hardcoded_home_paths_in_library_code():
+    """Covers libero/, scripts/ and RAMG/ (openvla/ is a vendored fork)."""
     absolute = re.compile(r"[\"'](/mnt/|/home/|/playpen)")
     offenders = []
-    for root, dirs, files in os.walk(os.path.join(REPO_ROOT, "libero")):
-        dirs[:] = [d for d in dirs if d not in {"__pycache__", "bddl_files", "init_files", "assets"}]
-        for name in files:
-            if not name.endswith(".py"):
-                continue
-            path = os.path.join(root, name)
-            with open(path, encoding="utf-8", errors="ignore") as f:
-                for lineno, line in enumerate(f, 1):
-                    if absolute.search(line):
-                        offenders.append(f"{os.path.relpath(path, REPO_ROOT)}:{lineno}")
+    roots = [os.path.join(REPO_ROOT, d) for d in ("libero", "scripts", "RAMG")]
+    for walk_root in roots:
+      for root, dirs, files in os.walk(walk_root):
+          dirs[:] = [d for d in dirs if d not in {"__pycache__", "bddl_files", "init_files", "assets"}]
+          for name in files:
+              if not name.endswith(".py"):
+                  continue
+              path = os.path.join(root, name)
+              with open(path, encoding="utf-8", errors="ignore") as f:
+                  for lineno, line in enumerate(f, 1):
+                      if absolute.search(line):
+                          offenders.append(f"{os.path.relpath(path, REPO_ROOT)}:{lineno}")
     assert not offenders, "hardcoded machine paths: " + ", ".join(offenders)
 
 
@@ -122,3 +126,64 @@ def test_is_debug_defaults_to_off(script):
         source = f.read()
     block = source.split('"--is_debug"')[1].split(")")[0]
     assert "default=0" in block, f"{script} still defaults to debug mode"
+
+
+
+def _is_max_steps_override_guard(test):
+    """Match exactly `args.max_steps is not None`, not any test mentioning max_steps."""
+    return (
+        isinstance(test, ast.Compare)
+        and len(test.ops) == 1
+        and isinstance(test.ops[0], ast.IsNot)
+        and isinstance(test.left, ast.Attribute)
+        and test.left.attr == "max_steps"
+        and isinstance(test.left.value, ast.Name)
+        and test.left.value.id == "args"
+        and len(test.comparators) == 1
+        and isinstance(test.comparators[0], ast.Constant)
+        and test.comparators[0].value is None
+    )
+
+
+def _parse(script):
+    with open(os.path.join(REPO_ROOT, script), encoding="utf-8") as f:
+        return ast.parse(f.read())
+
+
+@pytest.mark.parametrize("script", [
+    "libero/lifelong/eval_skill_chain.py",
+    "libero/lifelong/eval_skills_affected_by_oss.py",
+    "libero/lifelong/eval_skills_unaffected_by_oss.py",
+])
+def test_max_steps_override_guards_only_itself(script):
+    """An indentation slip here silently pulls following statements into the branch."""
+    tree = _parse(script)
+    found = 0
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.If):
+            continue
+        if not _is_max_steps_override_guard(node.test):
+            continue
+        found += 1
+        assert len(node.body) == 1, (
+            f"{script}: the --max_steps branch guards {len(node.body)} statements, expected 1"
+        )
+    assert found == 1, f"{script}: expected exactly one --max_steps guard, found {found}"
+
+
+def test_chain_eval_collects_every_sub_task_config():
+    """cfg_ls drives how many sub-envs the chain gets; it must not sit behind a flag."""
+    tree = _parse("libero/lifelong/eval_skill_chain.py")
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.If):
+            continue
+        for inner in ast.walk(node):
+            if (isinstance(inner, ast.Call)
+                    and isinstance(inner.func, ast.Attribute)
+                    and inner.func.attr == "append"
+                    and isinstance(inner.func.value, ast.Name)
+                    and inner.func.value.id in {"cfg_ls", "task_ls", "algo_ls", "init_states_ls"}):
+                raise AssertionError(
+                    f"{inner.func.value.id}.append is inside a conditional; the skill chain "
+                    f"would silently lose sub-tasks"
+                )
