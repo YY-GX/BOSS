@@ -45,11 +45,6 @@ def main():
         action="store_true",
     )
     parser.add_argument("--use-camera-obs", action="store_true")
-    parser.add_argument(
-        "--dataset-path",
-        type=str,
-        default="/home/yygx/UNC_Research/pkgs_simu/LIBERO/libero/datasets/modified_libero/",
-    )
     parser.add_argument("--no-proprio", action="store_true")
     parser.add_argument(
         "--use-depth",
@@ -153,7 +148,9 @@ def main():
         # I commented this
         # env.reset_from_xml_string(model_xml)
         env.sim.reset()
-        # SUPER IMPORTANT: I changed /home/yygx/anaconda3/envs/libero/lib/python3.8/site-packages/robosuite/utils/binding_utils.py file's 1167 line.
+        # Historical note: this used to require a hand-edit to robosuite's
+        # binding_utils.py under an older python3.8 environment. The robosuite
+        # 1.4.1 pinned in environment.yml is used unmodified.
         env.sim.set_state_from_flattened(states[init_idx])
         env.sim.forward()
         env.reset()
