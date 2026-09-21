@@ -21,7 +21,6 @@ from libero.lifelong.utils import (
 )
 from libero.lifelong.main import get_task_embs
 import robomimic.utils.obs_utils as ObsUtils
-from libero.lifelong.algos import get_algo_class
 from libero.lifelong.policy_starter import PolicyStarter
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -225,6 +224,7 @@ def main():
     succ_json_pth = os.path.join(
         args.model_path_folder, f"eval_tasks_on_ori_envs_seed{args.seed}", "succ_per_task_on_ori_envs.json"
     )
+    os.makedirs(os.path.dirname(succ_json_pth), exist_ok=True)
     with open(succ_json_pth, "w") as f:
         json.dump(succ_per_task, f, indent=2, sort_keys=True)
     print(f"[INFO] Per-task success rates saved to {succ_json_pth}")

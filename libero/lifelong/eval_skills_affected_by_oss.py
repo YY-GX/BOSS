@@ -261,6 +261,7 @@ def main():
     succ_json_pth = os.path.join(
         args.model_path_folder, f"eval_tasks_on_modified_envs_seed{args.seed}", f"succ_per_task_on_modified_envs_benchmark_{args.benchmark}.json"
     )
+    os.makedirs(os.path.dirname(succ_json_pth), exist_ok=True)
     with open(succ_json_pth, "w") as f:
         json.dump(succ_per_task, f, indent=2, sort_keys=True)
     print(f"[INFO] Per-task success rates saved to {succ_json_pth}")
