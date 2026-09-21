@@ -24,12 +24,14 @@ into your own OpenVLA checkout).
 - [Installation](#installation)
 - [Data setup](#data-setup)
 - [Skills training](#skills-training)
+- [Pre-trained checkpoints](#pre-trained-checkpoints)
 - [Challenges](#challenges)
   - [BOSS-C1: Single Predicate Shift](#boss-c1-single-predicate-shift)
   - [BOSS-C2: Accumulated Predicate Shift](#boss-c2-accumulated-predicate-shift)
   - [BOSS-C3: Real Long-Horizon Task](#boss-c3-real-long-horizon-task)
 - [Data augmentation (RAMG)](#data-augmentation-ramg)
 - [Reproducibility notes](#reproducibility-notes)
+- [Tests](#tests)
 - [Citation](#citation)
 
 ## Installation
@@ -105,6 +107,14 @@ DATASET_NAME=libero44 bash ../integrations/openvla/shells/finetune_openvla.sh
 
 The adapter is written to `runs/libero44/1.0.0/openvla-7b+libero44+...`.
 
+## Pre-trained checkpoints
+
+<!-- TODO(release): replace with the HuggingFace URL once uploaded -->
+Skill policies for all three BC baselines (44 checkpoints each, seed 10000) are
+distributed separately so the challenges can be run without re-training. Unpack
+them so that each policy lands at
+`experiments/boss_44/0.0.0/<PolicyType>_seed10000/run_001/`.
+
 ## Challenges
 
 The examples below evaluate one checkpoint folder; substitute the policy and seed
@@ -167,10 +177,13 @@ That covers C1, C2 and C3; logs and rollouts go to `experiments/logs/`.
 ## Data augmentation (RAMG)
 
 The Rule-based Automatic Modification Generator scales the 44 tasks into a large set
-of visually modified variants (1,727 tasks with one modification each).
+of visually modified variants (1,727 tasks with one modification each). The
+generated task definitions already ship in this repository
+(`libero/libero/bddl_files/data_augmentation/`, 1,727 files), so step 1 is only
+needed if you want to regenerate them or change the modification budget.
 
 ```shell
-# 1. generate modified bddl files
+# 1. (optional) regenerate the modified bddl files
 python RAMG/DA_bddl_files_scale_up_single_modification.py
 # ... or with several modifications per file
 python RAMG/DA_bddl_files_scale_up_multiple_modifications.py
@@ -179,7 +192,8 @@ python RAMG/DA_bddl_files_scale_up_multiple_modifications.py
 python RAMG/DA_demos_generation.py --benchmark data_augmentation
 ```
 
-Step 2 is long-running; `--start-index N` resumes from the N-th boss_44 task.
+Step 2 replays each original demo in its modified environment and is long-running
+(1,727 demonstrations); `--start-index N` resumes from the N-th boss_44 task.
 
 Train on the augmented set (paper Table I, **Setup B**):
 
@@ -195,7 +209,13 @@ For OpenVLA, regenerate a no-op-filtered dataset with
 `integrations/openvla/regenerate_libero_dataset.py` and convert it with
 [rlds_dataset_builder](https://github.com/kpertsch/rlds_dataset_builder).
 
-To request our pre-generated augmented dataset, contact `yygx@cs.unc.edu`.
+### Pre-generated data
+
+<!-- TODO(release): replace with the HuggingFace URL once uploaded -->
+The RLDS/TFDS build of the augmented set used for the OpenVLA results (56,945
+episodes) is distributed separately. The HDF5 form the BC baselines consume is
+not distributed; regenerate it with step 2 above, which needs only `boss_44` and
+the bddl files already in this repository.
 
 ## Reproducibility notes
 
