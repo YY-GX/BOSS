@@ -313,3 +313,13 @@ def test_demo_replay_tolerates_extra_degrees_of_freedom():
         assert "ValueError" in handled, f"handlers are {handled}"
         guarded = True
     assert guarded, "set_state_from_flattened is not guarded against the dimension mismatch"
+
+
+def test_both_training_entry_points_honour_is_debug():
+    """train_skills_augmented.py lost the debug shortcut when it was renamed."""
+    for script in ["libero/lifelong/train_skills.py",
+                   "libero/lifelong/train_skills_augmented.py"]:
+        with open(os.path.join(REPO_ROOT, script), encoding="utf-8") as f:
+            source = f.read()
+        assert "if cfg.is_debug:" in source, f"{script} ignores cfg.is_debug"
+        assert "n_manip_tasks = 2" in source, f"{script} does not shorten the task list"
