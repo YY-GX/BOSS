@@ -25,11 +25,6 @@ server_results/*
 ./sam/**
 libero/datasets/*
 libero/libero/assets/*
-openvla/runs/*
-openvla/datasets/*
-# Allow tracking experiments under openvla
-!openvla/experiments/
-!openvla/prismatic/vla/datasets/
 
 # Machine-local path config, generated on first import (absolute paths)
 .boss/
@@ -40,3 +35,7 @@ openvla/datasets/*
 /bert
 /libero/libero/assets
 /libero/datasets
+
+# The user's own OpenVLA checkout lives here; only our README is tracked
+openvla/*
+!openvla/README.md

@@ -78,10 +78,10 @@ def test_mappings_folder_is_inside_this_checkout():
 
 
 def test_no_hardcoded_home_paths_in_library_code():
-    """Covers libero/, scripts/ and RAMG/ (openvla/ is a vendored fork)."""
+    """Covers every folder whose code we ship."""
     absolute = re.compile(r"[\"'](/mnt/|/home/|/playpen)")
     offenders = []
-    roots = [os.path.join(REPO_ROOT, d) for d in ("libero", "scripts", "RAMG")]
+    roots = [os.path.join(REPO_ROOT, d) for d in ("libero", "scripts", "RAMG", "integrations")]
     for walk_root in roots:
       for root, dirs, files in os.walk(walk_root):
           dirs[:] = [d for d in dirs if d not in {"__pycache__", "bddl_files", "init_files", "assets"}]

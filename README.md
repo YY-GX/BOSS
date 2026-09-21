@@ -16,7 +16,8 @@ ships three challenges over 44 single-skill tasks.
 | **BOSS-C3** | Real long-horizon skill chaining | `ch3_1` … `ch3_10` |
 
 Baselines: BC-RESNET-RNN, BC-RESNET-T, BC-VIT-T (in `libero/lifelong/`) and OpenVLA
-(in `openvla/`).
+(via [`integrations/openvla/`](integrations/openvla/README.md), which wires BOSS
+into your own OpenVLA checkout).
 
 ## Table of Contents
 
@@ -33,8 +34,9 @@ Baselines: BC-RESNET-RNN, BC-RESNET-T, BC-VIT-T (in `libero/lifelong/`) and Open
 
 ## Installation
 
-BOSS is adapted from [LIBERO](https://lifelong-robot-learning.github.io/LIBERO/html/getting_started/installation.html)
-and [OpenVLA](https://github.com/openvla/openvla#installation).
+BOSS is adapted from [LIBERO](https://lifelong-robot-learning.github.io/LIBERO/html/getting_started/installation.html).
+The three BC baselines need only the environment below; OpenVLA is optional and
+set up separately (see [`integrations/openvla/`](integrations/openvla/README.md)).
 
 ```shell
 conda env create -f environment.yml    # creates the `boss` env (python 3.10)
@@ -43,7 +45,7 @@ pip install -e .
 ```
 
 `environment.yml` pins exact linux-64 builds. On other platforms, create the env
-manually and install `requirements.txt` plus the OpenVLA dependencies instead.
+manually and install `requirements.txt` instead.
 
 Then download the [`assets` folder](https://drive.google.com/file/d/1Rh24XyUy7Y5aE1jhiW2sZmpNh90-4s02/view?usp=sharing)
 and unpack it to `libero/libero/assets/`.
@@ -93,15 +95,15 @@ one `task<i>_model.pth` per skill. `<PolicyType>` is `BCRNNPolicy`,
 `BCTransformerPolicy` or `BCViLTPolicy`. The paper averages over three training runs
 (`seed=10000`, `10001`, `10002`) — see [Reproducibility notes](#reproducibility-notes).
 
-For OpenVLA:
+For OpenVLA, set it up once
+([`integrations/openvla/`](integrations/openvla/README.md)) and then, from inside
+your OpenVLA checkout:
 
 ```shell
-cd openvla
-zsh shells/run_openvla.sh    # edit the absolute paths at the top first
+DATASET_NAME=libero44 bash ../integrations/openvla/shells/finetune_openvla.sh
 ```
 
-The adapter is written to
-`runs/libero44/1.0.0/openvla-7b+libero44+b8+lr-0.0005+lora-r32+dropout-0.0--image_aug`.
+The adapter is written to `runs/libero44/1.0.0/openvla-7b+libero44+...`.
 
 ## Challenges
 
@@ -154,18 +156,13 @@ Per-chain success rate and per-level success rate land in
 `$MODEL/long_horizon_task_ch3_<i>_seed<seed>/`. Delta to Upper Bound Ratio
 (paper Fig. 5) is derived from these together with the C1-unaffected numbers.
 
-For OpenVLA:
+For OpenVLA, from inside your OpenVLA checkout:
 
 ```shell
-cd openvla
-python experiments/robot/libero/eval_openvla_ch1_ch2.py --seed 10000 --task_suite_name boss_44
-python experiments/robot/libero/eval_openvla_ch1_ch2.py --seed 10000 --task_suite_name ch1
-python experiments/robot/libero/eval_openvla_ch1_ch2.py --seed 10000 --task_suite_name ch2_2_modifications
-python experiments/robot/libero/eval_openvla_ch1_ch2.py --seed 10000 --task_suite_name ch2_3_modifications
-python experiments/robot/libero/eval_openvla_ch3.py --seed 10000
+SEED=10000 bash ../integrations/openvla/shells/eval_openvla.sh
 ```
 
-Logs and rollouts are written to `experiments/logs/`.
+That covers C1, C2 and C3; logs and rollouts go to `experiments/logs/`.
 
 ## Data augmentation (RAMG)
 
@@ -195,7 +192,7 @@ It combines each task's original demo with its augmented variants; see the
 `augmentation_mapping` must name a json in `libero/mappings/`.
 
 For OpenVLA, regenerate a no-op-filtered dataset with
-`openvla/experiments/robot/libero/regenerate_libero_dataset.py` and convert it with
+`integrations/openvla/regenerate_libero_dataset.py` and convert it with
 [rlds_dataset_builder](https://github.com/kpertsch/rlds_dataset_builder).
 
 To request our pre-generated augmented dataset, contact `yygx@cs.unc.edu`.
@@ -230,8 +227,8 @@ loadable.
 - `libero/libero/benchmark/__init__.py` registers suites beyond those used in the
   paper (`g1`–`g8`, `libero_local*`, `factor_1`, `factor_2`). They are exploratory and
   not part of the published results.
-- `openvla/` vendors a fork of the OpenVLA repository; the shell scripts under
-  `openvla/shells/` still contain absolute paths that need editing.
+- The OpenVLA evaluations seed the environment with a literal `0`, so unlike the
+  BC scripts they do not vary with `--seed`.
 
 ## Tests
 
