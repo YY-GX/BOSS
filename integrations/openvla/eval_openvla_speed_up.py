@@ -170,7 +170,7 @@ def eval_libero(cfg):
         # env, task_description = get_libero_env(task, cfg.model_family, resolution=256)
         # parallel env
         env, task_description = get_libero_subproc_env(task, num_trials_per_task=cfg.num_trials_per_task,
-                                                       resolution=256)
+                                                       resolution=256, seed=cfg.seed)
 
         # add traj for debugging
         actions_traj, proprios_traj = [], []

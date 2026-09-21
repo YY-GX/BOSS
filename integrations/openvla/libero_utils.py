@@ -42,8 +42,13 @@ def get_libero_env(task, model_family, resolution=256):
             )
 """
 
-def get_libero_subproc_env(task, num_trials_per_task=20, resolution=256):
-    """Initializes and returns the LIBERO environment, along with the task description."""
+def get_libero_subproc_env(task, num_trials_per_task=20, resolution=256, seed=0):
+    """Initializes and returns the LIBERO environment, along with the task description.
+
+    `seed` used to be a literal 0, so the evaluation ignored --seed. Note that
+    every rollout is started from a stored .pruned_init state that overwrites the
+    whole MuJoCo state, so this seed does not change object placement in practice.
+    """
     task_description = task.language
     task_bddl_file = os.path.join(get_libero_path("bddl_files"), task.problem_folder, task.bddl_file)
     env_args = {"bddl_file_name": task_bddl_file, "camera_heights": resolution, "camera_widths": resolution}
@@ -51,7 +56,7 @@ def get_libero_subproc_env(task, num_trials_per_task=20, resolution=256):
     env = SubprocVectorEnv(
         [lambda: OffScreenRenderEnv(**env_args) for _ in range(env_num)]
     )
-    env.seed(0)  # IMPORTANT: seed seems to affect object positions even when using fixed initial state
+    env.seed(seed)
     return env, task_description
 
 

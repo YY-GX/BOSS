@@ -51,9 +51,16 @@ SEED=10000 bash ../integrations/openvla/shells/eval_openvla.sh
 
 Logs and rollouts are written to `experiments/logs/`.
 
-## Caveat
+## Seeding
 
-`get_libero_subproc_env` in `libero_utils.py` calls `env.seed(0)` with a literal,
-so the OpenVLA evaluations do not vary with `--seed`. The BC evaluations in
-`libero/lifelong/` seed from the command line; see the reproducibility notes in
-the top-level README for what each seed actually controls.
+All three evaluation scripts now seed from `--seed`:
+`eval_openvla_ch1_ch2.py` already called `set_seed_everywhere`;
+`eval_openvla_ch3.py` imported it but never called it, and hardcoded `seed=10000`
+in the model config; `get_libero_subproc_env` hardcoded `env.seed(0)`.
+
+`eval_openvla_ch3.py` also takes `--lht` to evaluate a subset of the ten chains
+instead of always looping over all of them.
+
+See the reproducibility notes in the top-level README for what each seed actually
+controls — in particular, the environment seed has no effect on rollouts, because
+every episode starts from a stored `.pruned_init` state.

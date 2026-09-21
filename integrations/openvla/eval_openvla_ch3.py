@@ -71,6 +71,13 @@ def parse_args():
                         default="runs/libero44/1.0.0/openvla-7b+libero44+b8+lr-0.0005+lora-r32+dropout-0.0--image_aug")
     parser.add_argument("--seed", type=int, required=True, default=10000)
     parser.add_argument("--device_id", type=int, default=0)
+    parser.add_argument(
+        "--lht",
+        type=int,
+        nargs="+",
+        default=list(range(1, 11)),
+        help="Which BOSS-C3 long-horizon tasks to evaluate (1-10). Defaults to all.",
+    )
     args = parser.parse_args()
     args.device_id = "cuda:" + str(args.device_id)
     return args
@@ -136,6 +143,9 @@ def openvla_select_action(obs, task_description, model, openvla_cfg, resize_size
 def main():
     args = parse_args()
 
+    # imported but never called before: --seed only named the output directory
+    set_seed_everywhere(args.seed)
+
     openvla_cfg = SimpleNamespace(
         model_family="openvla",
         pretrained_checkpoint=args.openvla_ckpt,
@@ -150,14 +160,14 @@ def main():
         use_wandb=False,
         wandb_project="YOUR_WANDB_PROJECT",
         wandb_entity="YOUR_WANDB_ENTITY",
-        seed=10000,
+        seed=args.seed,
         unnorm_key="libero44"  # there might be issue for unnorm_key
     )
 
     openvla_model = get_model(openvla_cfg)
 
-    # Loop 10 long horizon tasks
-    for lht_idx in range(1, 11):
+    # Loop over the selected long horizon tasks
+    for lht_idx in args.lht:
         lht_name = f"ch3_{lht_idx}"
         """
         Preparation for Evaluation
