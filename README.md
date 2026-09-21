@@ -237,20 +237,30 @@ the same distribution — but individual numbers will not match an unseeded run.
 **Evaluation hyper-parameters come from the checkpoint**, not from
 `libero/configs/eval/default.yaml`: the eval scripts read `cfg` out of
 `task<i>_model.pth`, so `n_eval` and `max_steps` are whatever was configured at
-training time. Editing the yaml afterwards has no effect on evaluation.
+training time. Editing the yaml afterwards has no effect on evaluation — pass
+`--max_steps` instead.
 
-**Environment drift.** The paper numbers were produced with the pinned
-`environment.yml`. Notably, from PyTorch 2.6 `torch.load` defaults to
+**The published numbers use `max_steps=400`.** This matters: on BOSS-C3 task 1,
+BC-RESNET-T reaches a Delta to Upper Bound Ratio of 89% at 400 steps, matching
+Figure 5, and only 67% at 600 steps, because the extra time lets more chains
+finish. If your checkpoints carry a different `max_steps`, override it:
+
+```shell
+python libero/lifelong/eval_skill_chain.py --model_path_folder $MODEL \
+  --seed 10000 --max_steps 400
+```
+
+**Environment drift.** From PyTorch 2.6 `torch.load` defaults to
 `weights_only=True`, which cannot unpickle the `EasyDict` config stored inside our
-checkpoints; `torch_load_model` passes `weights_only=False` to keep old checkpoints
-loadable.
+checkpoints; `torch_load_model` passes `weights_only=False` so older checkpoints
+keep loading.
 
 **Known limitations.**
 - `libero/libero/benchmark/__init__.py` registers suites beyond those used in the
   paper (`g1`–`g8`, `libero_local*`, `factor_1`, `factor_2`). They are exploratory and
   not part of the published results.
-- The OpenVLA evaluations seed the environment with a literal `0`, so unlike the
-  BC scripts they do not vary with `--seed`.
+- The augmented demonstrations for paper Table I, Setup B are not distributed in
+  HDF5 form and have to be regenerated with RAMG.
 
 ## Tests
 
@@ -258,8 +268,9 @@ loadable.
 pytest tests/
 ```
 
-A small regression suite covering the seeding, path-resolution and dataset-prep
-fixes. It runs in about 30 seconds and needs neither assets nor checkpoints.
+A regression suite covering the seeding, path-resolution, packaging and
+dataset-prep fixes. It runs in well under a minute and needs neither assets nor
+checkpoints.
 
 ## Citation
 
