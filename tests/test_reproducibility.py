@@ -246,3 +246,31 @@ def test_environment_yml_and_requirements_agree():
     # every requirement is exactly pinned, so the environment is reproducible
     unpinned = [r for r in reqs if "==" not in r]
     assert not unpinned, f"unpinned requirements: {unpinned}"
+
+
+@pytest.mark.parametrize("script", [
+    "libero/lifelong/eval_skills_affected_by_oss.py",
+    "libero/lifelong/eval_skills_unaffected_by_oss.py",
+])
+def test_debug_mode_truncates_the_task_loop(script):
+    """n_tasks truncates task_embs; the loop must be truncated with it."""
+    with open(os.path.join(REPO_ROOT, script), encoding="utf-8") as f:
+        source = f.read()
+    assert "benchmark.task_indexes[:n_tasks]" in source, (
+        f"{script} iterates all task_indexes while n_tasks may be smaller, so "
+        f"benchmark.get_task_emb() runs off the end of task_embs"
+    )
+
+
+def test_debug_mode_task_embeddings_stay_in_range():
+    """The behaviour the above guards: one task in, one task out."""
+    from libero.libero.benchmark import get_benchmark
+
+    benchmark = get_benchmark("boss_44")(n_tasks=1)
+    n_tasks = benchmark.n_tasks
+    task_ids = benchmark.task_indexes[:n_tasks]
+    benchmark.set_task_embs(torch.randn(n_tasks, 768))
+
+    assert len(task_ids) == 1
+    for idx in range(len(task_ids)):
+        assert benchmark.get_task_emb(idx).shape == (768,)

@@ -73,7 +73,9 @@ def main():
     else:
         benchmark = get_benchmark(args.benchmark)()
     n_tasks = benchmark.n_tasks
-    task_id_ls = benchmark.task_indexes
+    # n_tasks truncates the language embeddings, so the loop has to be truncated
+    # with it -- otherwise benchmark.get_task_emb() runs off the end on task 2.
+    task_id_ls = benchmark.task_indexes[:n_tasks]
 
     # Obtain language descriptions
     descriptions = [benchmark.get_task(i).language for i in range(n_tasks)]
