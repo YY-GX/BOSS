@@ -46,8 +46,10 @@ conda activate boss
 pip install -e .
 ```
 
-`environment.yml` pins exact linux-64 builds. On other platforms, create the env
-manually and install `requirements.txt` instead.
+`environment.yml` just pulls in `requirements.txt`, which pins the versions the
+paper's environment ran with; the set is verified to resolve together on python
+3.10. OpenVLA is deliberately not part of it — its dependencies conflict with
+these — so install it separately if you need that baseline.
 
 Then download the [`assets` folder](https://drive.google.com/file/d/1Rh24XyUy7Y5aE1jhiW2sZmpNh90-4s02/view?usp=sharing)
 and unpack it to `libero/libero/assets/`.

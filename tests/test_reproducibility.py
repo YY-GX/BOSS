@@ -227,3 +227,22 @@ def test_setup_py_actually_finds_the_packages():
     assert "libero" in packages, f"top-level libero package not found: {packages}"
     for expected in ["libero.libero", "libero.lifelong", "libero.libero.benchmark"]:
         assert expected in packages, f"{expected} missing from {packages}"
+
+
+def test_environment_yml_and_requirements_agree():
+    """environment.yml must defer to requirements.txt rather than re-pin versions."""
+    import yaml
+
+    env = yaml.safe_load(open(os.path.join(REPO_ROOT, "environment.yml")))
+    pip_section = next((d["pip"] for d in env["dependencies"] if isinstance(d, dict)), [])
+    assert pip_section == ["-r requirements.txt"], pip_section
+
+    reqs = [
+        line.strip()
+        for line in open(os.path.join(REPO_ROOT, "requirements.txt"))
+        if line.strip() and not line.startswith("#")
+    ]
+    assert len(reqs) > 20, reqs
+    # every requirement is exactly pinned, so the environment is reproducible
+    unpinned = [r for r in reqs if "==" not in r]
+    assert not unpinned, f"unpinned requirements: {unpinned}"
