@@ -148,11 +148,20 @@ def main():
         # I commented this
         # env.reset_from_xml_string(model_xml)
         env.sim.reset()
-        # Historical note: this used to require a hand-edit to robosuite's
-        # binding_utils.py under an older python3.8 environment. The robosuite
-        # 1.4.1 pinned in environment.yml is used unmodified.
-        env.sim.set_state_from_flattened(states[init_idx])
-        env.sim.forward()
+        # A RAMG modification can add objects, so the modified environment has
+        # more degrees of freedom than the one this demonstration was recorded
+        # in, and robosuite raises
+        #     ValueError: could not broadcast input array from shape (29,) into shape (42,)
+        # This used to be worked around by hand-editing robosuite's
+        # binding_utils.py. It does not need a workaround: the env.reset() two
+        # lines down discards whatever state is loaded here, and the replay is
+        # open-loop over the recorded actions. Tolerate the mismatch instead of
+        # requiring users to patch site-packages.
+        try:
+            env.sim.set_state_from_flattened(states[init_idx])
+            env.sim.forward()
+        except ValueError:
+            pass
         env.reset()
         # model_xml = env.sim.model.get_xml()
 

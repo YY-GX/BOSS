@@ -288,3 +288,28 @@ def test_dataset_download_uses_a_live_source():
     assert download_utils.HF_DATASET_REPO == "yifengzhu-hf/LIBERO-datasets"
     assert download_utils.DATASET_SUBSETS["libero_100"] == ["libero_10", "libero_90"]
     assert "libero_90" in download_utils.DATASET_SUBSETS
+
+
+def test_demo_replay_tolerates_extra_degrees_of_freedom():
+    """A RAMG modification can add objects, growing the env's qpos/qvel beyond
+    what the demonstration stored. robosuite then raises ValueError, which used
+    to be worked around by hand-editing site-packages."""
+    tree = _parse("scripts/DemoProcessor.py")
+    guarded = False
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Try):
+            continue
+        calls = [
+            n for n in ast.walk(node)
+            if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)
+            and n.func.attr == "set_state_from_flattened"
+        ]
+        if not calls:
+            continue
+        handled = [
+            h.type.id for h in node.handlers
+            if isinstance(h.type, ast.Name)
+        ]
+        assert "ValueError" in handled, f"handlers are {handled}"
+        guarded = True
+    assert guarded, "set_state_from_flattened is not guarded against the dimension mismatch"
