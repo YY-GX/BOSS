@@ -45,16 +45,20 @@ def main():
     if not os.path.isdir(target):
         source = args.source
         if source is None:
+            # skip dotfolders: huggingface_hub leaves a .cache/ next to the data
             subdirs = [
                 d for d in sorted(os.listdir(dataset_dir))
-                if os.path.isdir(os.path.join(dataset_dir, d))
+                if os.path.isdir(os.path.join(dataset_dir, d)) and not d.startswith(".")
             ]
-            if len(subdirs) != 1:
+            if "libero_90" in subdirs:
+                source = "libero_90"
+            elif len(subdirs) == 1:
+                source = subdirs[0]
+            else:
                 raise SystemExit(
-                    f"Expected exactly one sub-folder in {dataset_dir} to rename, found {subdirs}. "
+                    f"Expected libero_90 or exactly one sub-folder in {dataset_dir}, found {subdirs}. "
                     f"Pass --source explicitly."
                 )
-            source = subdirs[0]
         os.rename(os.path.join(dataset_dir, source), target)
         print(f"Renamed {source} -> boss_44")
 
