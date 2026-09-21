@@ -61,15 +61,15 @@ somewhere else. Run all commands below **from the repository root**.
 
 ## Data setup
 
-Download the LIBERO-90 demonstrations into `libero/datasets/libero_90/`. LIBERO's
-original utexas.box.com links now return 403, so use the HuggingFace mirror:
+Download the LIBERO-90 demonstrations:
 
 ```shell
-pip install huggingface_hub
-huggingface-cli download yifengzhu-hf/LIBERO-datasets \
-  --repo-type dataset --include "libero_90/*" \
-  --local-dir libero/datasets
+python benchmark_scripts/download_libero_datasets.py --datasets libero_90
 ```
+
+They land in `libero/datasets/libero_90/`. LIBERO's original utexas.box.com
+links all return 403 now, so this pulls from upstream's HuggingFace mirror
+(`yifengzhu-hf/LIBERO-datasets`) instead.
 
 Then reduce it to the 44 single-skill tasks:
 

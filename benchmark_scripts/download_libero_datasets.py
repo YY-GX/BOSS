@@ -16,8 +16,17 @@ def parse_args():
     parser.add_argument(
         "--datasets",
         type=str,
-        choices=["all", "libero_goal", "libero_spatial", "libero_object", "libero_100"],
+        choices=[
+            "all",
+            "libero_goal",
+            "libero_spatial",
+            "libero_object",
+            "libero_10",
+            "libero_90",
+            "libero_100",
+        ],
         default="all",
+        help="BOSS needs libero_90.",
     )
     return parser.parse_args()
 

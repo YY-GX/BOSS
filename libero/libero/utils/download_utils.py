@@ -15,11 +15,19 @@ from libero.libero import get_libero_path
 
 DIR = os.path.dirname(__file__)
 
-DATASET_LINKS = {
-    "libero_object": "https://utexas.box.com/shared/static/avkklgeq0e1dgzxz52x488whpu8mgspk.zip",
-    "libero_goal": "https://utexas.box.com/shared/static/iv5e4dos8yy2b212pkzkpxu9wbdgjfeg.zip",
-    "libero_spatial": "https://utexas.box.com/shared/static/04k94hyizn4huhbv5sz4ev9p2h1p6s7f.zip",
-    "libero_100": "https://utexas.box.com/shared/static/cv73j8zschq8auh9npzt876fdc1akvmk.zip",
+# LIBERO's original utexas.box.com links all return 403; upstream now publishes
+# the same demonstrations on the HuggingFace Hub.
+HF_DATASET_REPO = "yifengzhu-hf/LIBERO-datasets"
+
+# "libero_100" is the union of the two long/short task suites, kept as an alias
+# for the old API. BOSS itself only needs libero_90.
+DATASET_SUBSETS = {
+    "libero_object": ["libero_object"],
+    "libero_goal": ["libero_goal"],
+    "libero_spatial": ["libero_spatial"],
+    "libero_10": ["libero_10"],
+    "libero_90": ["libero_90"],
+    "libero_100": ["libero_10", "libero_90"],
 }
 
 
@@ -98,42 +106,40 @@ def download_url(url, download_dir, check_overwrite=True, is_zipfile=True):
 
 
 def libero_dataset_download(datasets="all", download_dir=None, check_overwrite=True):
-    """Download libero datasets
+    """Download LIBERO demonstrations from the HuggingFace Hub.
 
     Args:
-        datasets (str, optional): Specify which datasets to save. Defaults to "all", downloading all the datasets.
-        download_dir (str, optional): Target location for storing datasets. Defaults to None, using the default path.
-        check_overwrite (bool, optional): Check if overwriting datasets. Defaults to True.
+        datasets (str): a key of DATASET_SUBSETS, or "all".
+        download_dir (str, optional): target directory. Defaults to the
+            configured datasets path.
+        check_overwrite (bool): unused, kept for API compatibility --
+            huggingface_hub skips files that are already present.
     """
+    try:
+        from huggingface_hub import snapshot_download
+    except ImportError as exc:  # pragma: no cover - depends on the environment
+        raise SystemExit(
+            "huggingface_hub is required to download the datasets: pip install huggingface_hub"
+        ) from exc
+
+    valid = sorted(DATASET_SUBSETS) + ["all"]
+    if datasets not in valid:
+        raise ValueError(f"Unknown dataset {datasets!r}; choose one of {valid}")
 
     if download_dir is None:
         download_dir = get_libero_path("datasets")
-    if not os.path.exists(download_dir):
-        os.makedirs(download_dir)
+    os.makedirs(download_dir, exist_ok=True)
 
-        assert datasets in [
-            "all",
-            "libero_object",
-            "libero_goal",
-            "libero_spatial",
-            "libero_100",
-        ]
+    wanted = sorted(DATASET_SUBSETS) if datasets == "all" else [datasets]
+    subsets = sorted({s for name in wanted for s in DATASET_SUBSETS[name]})
 
-    for dataset_name in [
-        "libero_object",
-        "libero_goal",
-        "libero_spatial",
-        "libero_100",
-    ]:
-        if datasets == dataset_name or datasets == "all":
-            print(f"Downloading {dataset_name}")
-            download_url(
-                DATASET_LINKS[dataset_name],
-                download_dir=download_dir,
-                check_overwrite=check_overwrite,
-            )
-
-            # (TODO): unzip the files
+    print(f"Downloading {subsets} from {HF_DATASET_REPO} into {download_dir}")
+    snapshot_download(
+        repo_id=HF_DATASET_REPO,
+        repo_type="dataset",
+        local_dir=download_dir,
+        allow_patterns=[f"{s}/*" for s in subsets],
+    )
 
 
 def check_libero_dataset(download_dir=None):

@@ -274,3 +274,17 @@ def test_debug_mode_task_embeddings_stay_in_range():
     assert len(task_ids) == 1
     for idx in range(len(task_ids)):
         assert benchmark.get_task_emb(idx).shape == (768,)
+
+
+def test_dataset_download_uses_a_live_source():
+    """LIBERO's utexas.box.com links all 403; the downloader must not use them."""
+    from libero.libero.utils import download_utils
+
+    source = open(download_utils.__file__, encoding="utf-8").read()
+    # the hostname may still appear in a comment; what must be gone is any URL
+    assert "https://utexas.box.com" not in source, (
+        "downloader still points at the dead Box links"
+    )
+    assert download_utils.HF_DATASET_REPO == "yifengzhu-hf/LIBERO-datasets"
+    assert download_utils.DATASET_SUBSETS["libero_100"] == ["libero_10", "libero_90"]
+    assert "libero_90" in download_utils.DATASET_SUBSETS
