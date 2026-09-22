@@ -331,6 +331,18 @@ shell alias or script sets it.
 **`ModuleNotFoundError: libero`.** Run from the repository root, and check that
 `pip install -e .` succeeded.
 
+**Install fails building `bddl` with `[Errno 39] Directory not empty`.** `bddl`
+ships as a source distribution, so pip builds it locally, and the cleanup step of
+that build fails on NFS — a deleted-but-open file is renamed to `.nfsXXXX`, which
+leaves the directory non-empty. Build on a local disk instead:
+
+```shell
+TMPDIR=/var/tmp conda env create -f environment.yml
+```
+
+The environment itself can live on NFS; only the build directory needs to be
+local.
+
 ## Repository layout
 
 ```
