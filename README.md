@@ -81,7 +81,8 @@ pip install -e .
 environment ran. OpenVLA is deliberately **not** part of it — its dependencies
 conflict with these — so set that up separately if you need that baseline.
 
-Then fetch the simulation assets (meshes, textures, scene XMLs):
+Then fetch the simulation assets (meshes, textures, scene XMLs) from
+[`yygx/BOSS-assets`](https://huggingface.co/datasets/yygx/BOSS-assets):
 
 ```shell
 huggingface-cli download yygx/BOSS-assets --repo-type dataset \
