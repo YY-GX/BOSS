@@ -1,6 +1,7 @@
 # BOSS: Benchmark for Observation Space Shift in Long-Horizon Task
 
-Official implementation of [BOSS](https://arxiv.org/pdf/2502.15679) (Yang et al., 2025).
+Official implementation of **BOSS** (Yang et al., *IEEE Robotics and Automation
+Letters*, 2025) — [paper](https://arxiv.org/abs/2502.15679).
 Project page: https://boss-benchmark.github.io/
 
 BOSS studies **Observation Space Shift (OSS)**: when skills are chained, a preceding
@@ -298,9 +299,13 @@ checkpoints.
 
 ```bibtex
 @article{yang2025boss,
-  title={BOSS: Benchmark for Observation Space Shift in Long-Horizon Task},
+  title={BOSS: Benchmark for observation space shift in long-horizon task},
   author={Yang, Yue and Zhao, Linfeng and Ding, Mingyu and Bertasius, Gedas and Szafir, Daniel},
-  journal={arXiv preprint arXiv:2502.15679},
-  year={2025}
+  journal={IEEE Robotics and Automation Letters},
+  volume={10},
+  number={9},
+  pages={8882--8889},
+  year={2025},
+  publisher={IEEE}
 }
 ```
