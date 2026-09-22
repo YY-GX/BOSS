@@ -48,7 +48,7 @@ Shortest path from a fresh clone to a BOSS number, using our released
 checkpoints — no training required.
 
 ```shell
-git clone https://github.com/YY-GX/BOSS.git && cd BOSS
+git clone https://github.com/Boss-Benchmark/BOSS.git && cd BOSS
 conda env create -f environment.yml && conda activate boss
 pip install -e .
 
