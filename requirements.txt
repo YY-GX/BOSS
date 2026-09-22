@@ -5,10 +5,16 @@
 #
 # OpenVLA is NOT included: it has its own, conflicting dependency set. Install it
 # separately -- see integrations/openvla/README.md.
+#
+# Two entries below are transitive dependencies our own code never imports, but
+# without which a clean install fails. Both were found by building the
+# environment from scratch, not by reading the source.
 bddl==1.0.1
 cloudpickle==2.1.0
 easydict==1.9
 einops==0.4.1
+# bddl imports future.utils but does not declare it
+future==0.18.2
 gym==0.25.2
 h5py==3.12.1
 hydra-core==1.2.0
@@ -25,6 +31,8 @@ pytest==8.3.3
 PyYAML==6.0.2
 robomimic==0.2.0
 robosuite==1.4.1
+# wandb 0.13.1 imports pkg_resources, dropped by setuptools 81
+setuptools==80.10.2
 termcolor==2.4.0
 thop==0.1.1-2209072238
 torch==2.6.0

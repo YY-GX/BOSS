@@ -15,6 +15,9 @@ logs/
 
 *.mp4
 libero.egg-info/
+# `pip install -e .` and `conda env create` leave these behind
+*.egg-info/
+condaenv.*.requirements.txt
 .vscode/
 videos/
 ./sam/grounded_outputs
