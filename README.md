@@ -51,8 +51,12 @@ paper's environment ran with; the set is verified to resolve together on python
 3.10. OpenVLA is deliberately not part of it — its dependencies conflict with
 these — so install it separately if you need that baseline.
 
-Then download the [`assets` folder](https://drive.google.com/file/d/1Rh24XyUy7Y5aE1jhiW2sZmpNh90-4s02/view?usp=sharing)
-and unpack it to `libero/libero/assets/`.
+Then fetch the simulation assets:
+
+```shell
+huggingface-cli download yygx/BOSS-assets --repo-type dataset \
+  --local-dir libero/libero/assets
+```
 
 On first import the package writes `.boss/config.yaml` at the repository root,
 recording where assets, bddl files, init states and datasets live. It is
@@ -111,11 +115,17 @@ The adapter is written to `runs/libero44/1.0.0/openvla-7b+libero44+...`.
 
 ## Pre-trained checkpoints
 
-<!-- TODO(release): replace with the HuggingFace URL once uploaded -->
 Skill policies for all three BC baselines (44 checkpoints each, seed 10000) are
-distributed separately so the challenges can be run without re-training. Unpack
-them so that each policy lands at
-`experiments/boss_44/0.0.0/<PolicyType>_seed10000/run_001/`.
+published at [`yygx/BOSS-checkpoints`](https://huggingface.co/yygx/BOSS-checkpoints),
+so the challenges can be run without re-training:
+
+```shell
+huggingface-cli download yygx/BOSS-checkpoints --local-dir experiments/boss_44/0.0.0
+```
+
+That lands each policy at
+`experiments/boss_44/0.0.0/<PolicyType>_seed10000/run_001/`. Evaluate them with
+`--max_steps 400`; see [Reproducibility notes](#reproducibility-notes).
 
 ## Challenges
 
