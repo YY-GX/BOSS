@@ -113,6 +113,11 @@ DATASET_NAME=libero44 bash ../integrations/openvla/shells/finetune_openvla.sh
 
 The adapter is written to `runs/libero44/1.0.0/openvla-7b+libero44+...`.
 
+Both fine-tuned models from paper Table I are published at
+[`yygx/BOSS-openvla-adapters`](https://huggingface.co/yygx/BOSS-openvla-adapters)
+(`setup_a_libero44/` and `setup_b_augmented/`) if you would rather not spend the
+GPU time.
+
 ## Pre-trained checkpoints
 
 Skill policies for all three BC baselines (44 checkpoints each, seed 10000) are
@@ -223,11 +228,18 @@ For OpenVLA, regenerate a no-op-filtered dataset with
 
 ### Pre-generated data
 
-<!-- TODO(release): replace with the HuggingFace URL once uploaded -->
-The RLDS/TFDS build of the augmented set used for the OpenVLA results (56,945
-episodes) is distributed separately. The HDF5 form the BC baselines consume is
-not distributed; regenerate it with step 2 above, which needs only `boss_44` and
-the bddl files already in this repository.
+The RLDS/TFDS build used for the OpenVLA results — 56,945 episodes over 1,727
+modified tasks — is published at
+[`yygx/BOSS-data-augmentation`](https://huggingface.co/datasets/yygx/BOSS-data-augmentation):
+
+```shell
+huggingface-cli download yygx/BOSS-data-augmentation --repo-type dataset \
+  --local-dir datasets
+```
+
+The HDF5 form the BC baselines consume is **not** distributed; regenerate it with
+step 2 above, which needs only `boss_44` and the bddl files already in this
+repository (roughly 6 minutes per task, `--start-index N` to resume).
 
 ## Reproducibility notes
 
